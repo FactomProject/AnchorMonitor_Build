@@ -3,32 +3,46 @@ var express_graphql = require('express-graphql');
 var { buildSchema } = require('graphql');
 const axios = require("axios");
 var W3CWebSocket = require('websocket').w3cwebsocket;
+require('dotenv').config();
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.DATABASE, { useNewUrlParser: true });
+mongoose.Promise = global.Promise;
+mongoose.connection
+  .on('connected', () => {
+    console.log(`Mongoose connection open on ${process.env.DATABASE}`);
+  })
+  .on('error', (err) => {
+    console.log(`Connection error: ${err.message}`);
+  });
+
 // GraphQL schema
 var schema = buildSchema(`
-    type Query {
-        message: String
-    }
+type Query {
+    message: String
+}
 `);
 // Root resolver
 var root = {
     message: () => 'Hello World!'
 };
 // Create an express server and a GraphQL endpoint
-var app = express();
-app.use('/graphql', express_graphql({
-    schema: schema,
-    rootValue: root,
-    graphiql: true
-}));
-
-var wsUri = "wss://ws.blockchain.info/inv";
-
-var client = new W3CWebSocket('wss://ws.blockchain.info/inv');
- 
-client.onerror = function() {
-    console.log('Connection Error');
-};
- 
+    var app = express();
+    app.use('/graphql', express_graphql({
+        schema: schema,
+        rootValue: root,
+        graphiql: true
+    }));
+    app.listen(4000, () => console.log('Express GraphQL Server Now Running On localhost:4000/graphql'));
+    
+    var wsUri = "wss://ws.blockchain.info/inv";
+    
+    var client = new W3CWebSocket('wss://ws.blockchain.info/inv');
+    
+    client.onerror = function() {
+        console.log('Connection Error');
+    };
+    
 client.onopen = function() {
     console.log('WebSocket Client Connected');
  
@@ -119,9 +133,22 @@ factomBitcoinTX = () => {
         .catch(err => console.log(err));
 }
 
-setTimeout(() => {
-    factomBitcoinTX()
-}, 600000)
+// setInterval(() => {
+//     factomBitcoinTX()
+// }, 600000)
 
-app.listen(4000, () => console.log('Express GraphQL Server Now Running On localhost:4000/graphql'));
+CallHarm = () => {
+    axios({
+        method: "GET",
+        url: "https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks",
+        headers: {
+            "Content-Type": "application/json",
+            "app_id": "c6bd4cff",
+            "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+        }
+    }).then(res => {
+        console.log("Harmony Call", res.data)
+    })
+}
 
+// CallHarm()
