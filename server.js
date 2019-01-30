@@ -5,150 +5,204 @@ const axios = require("axios");
 var W3CWebSocket = require('websocket').w3cwebsocket;
 require('dotenv').config();
 const mongoose = require('mongoose');
+const FactomBlocks = require('./models/BlocksFromHarmony');
 
 mongoose.connect(process.env.DATABASE, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 mongoose.connection
-  .on('connected', () => {
-    console.log(`Mongoose connection open on ${process.env.DATABASE}`);
-  })
-  .on('error', (err) => {
-    console.log(`Connection error: ${err.message}`);
-  });
+  .on('connected', () => { CheckDataBase() })
+  .on('error', (err) => { console.log(`Connection error: ${err.message}`) });
+
+
 
 // GraphQL schema
 var schema = buildSchema(`
 type Query {
-    message: String
+  message: String
 }
 `);
 // Root resolver
 var root = {
-    message: () => 'Hello World!'
+  message: () => 'Hello World!'
 };
 // Create an express server and a GraphQL endpoint
-    var app = express();
-    app.use('/graphql', express_graphql({
-        schema: schema,
-        rootValue: root,
-        graphiql: true
-    }));
-    app.listen(4000, () => console.log('Express GraphQL Server Now Running On localhost:4000/graphql'));
+var app = express();
+app.use('/graphql', express_graphql({
+  schema: schema,
+  rootValue: root,
+  graphiql: true
+}));
+let vep = app.listen(5001, () => console.log(`Express GraphQL Server Now Running On ${vep.address().port}`));
     
-    var wsUri = "wss://ws.blockchain.info/inv";
-    
-    var client = new W3CWebSocket('wss://ws.blockchain.info/inv');
-    
-    client.onerror = function() {
-        console.log('Connection Error');
-    };
+// Socket to listen to Factoms address on Blockchain.com
+let client = new W3CWebSocket('wss://ws.blockchain.info/inv');    
+client.onerror = function() {
+  console.log('Connection Error');
+};
     
 client.onopen = function() {
-    console.log('WebSocket Client Connected');
- 
-    function sendNumber() {
-        if (client.readyState === client.OPEN) {
-            client.send(`{"op":"addr_sub", "addr":"1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF"}`);
-        }
+  console.log('WebSocket Client Connected');
+
+  function sendNumber() {
+    if (client.readyState === client.OPEN) {
+      client.send(`{"op":"addr_sub", "addr":"1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF"}`);
     }
-    sendNumber();
+  }
+  sendNumber();
 };
  
 client.onclose = function() {
-    console.log('echo-protocol Client Closed');
+  console.log('echo-protocol Client Closed');
 };
  
 client.onmessage = function(e) {
-    if (typeof e.data === 'string') {
-        console.log("Received: '" + e.data + "'");
-        axios({
-            method: "post",
-            url:
-              "https://hooks.slack.com/services/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",
-            headers: { "Content-type": "application/json" },
-            data: {
-              text: "",
-              attachments: [
-                {
-                  fields: [
-                    {
-                      title: `FROM THE FREAKING SOCKET`,
-                      short: true
-                    }
-                  ],
-                  color: "#FFB233",
-                  text: `Last Trans Info: ${
-                    e.data
-                  } `
-                }
-              ]
-            }
-          })
-            .then(res => {
-             console.log("From socket to Slack")
-            })
-            .catch(err => {
-              console.log("Or THIS??", err);
-            });
-    }
+  if (typeof e.data === 'string') {
+    console.log("Received: '" + e.data + "'");
+    axios({
+      method: "post",
+      url:
+        "https://hooks.slack.com/services/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",
+      headers: { "Content-type": "application/json" },
+      data: {
+        text: "",
+        attachments: [
+          {
+            fields: [
+              {
+                title: `FROM THE FREAKING SOCKET`,
+                short: true
+              }
+            ],
+            color: "#FFB233",
+            text: `Last Trans Info: ${
+              e.data
+            } `
+          }
+        ]
+      }
+    })
+      .then(res => {
+        console.log("From socket to Slack")
+      })
+      .catch(err => {
+        console.log("Or THIS??", err);
+      });
+  }
 };
 
 factomBitcoinTX = () => {
-    axios({
-        method: "get",
-        url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
+  axios({
+    method: "get",
+    url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
+  })
+    .then(response => {
+      console.log(response.data.n_tx)
+      // axios({
+      //   method: "post",
+      //   url:
+      //     "https://hooks.slack.com/services/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",
+      //   headers: { "Content-type": "application/json" },
+      //   data: {
+      //     text: "",
+      //     attachments: [
+      //       {
+      //         fields: [
+      //           {
+      //             title: `Trans Count ${response.data.n_tx}%!!!`,
+      //             short: true
+      //           }
+      //         ],
+      //         color: "#FFB233",
+      //         text: `Last Trans Info: ${
+      //           response.data.txs[0]
+      //         } `
+      //       }
+      //     ]
+      //   }
+      // })
+      //   .then(res => {
+      //     console.log("done")
+      //   })
+      //   .catch(err => {
+      //     console.log("Or THIS??", err);
+      //   });
     })
-        .then(response => {
-          console.log(response.data.n_tx)
-          axios({
-            method: "post",
-            url:
-              "https://hooks.slack.com/services/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",
-            headers: { "Content-type": "application/json" },
-            data: {
-              text: "",
-              attachments: [
-                {
-                  fields: [
-                    {
-                      title: `Trans Count ${response.data.n_tx}%!!!`,
-                      short: true
-                    }
-                  ],
-                  color: "#FFB233",
-                  text: `Last Trans Info: ${
-                    response.data.txs[0]
-                  } `
-                }
-              ]
-            }
-          })
-            .then(res => {
-             console.log("done")
-            })
-            .catch(err => {
-              console.log("Or THIS??", err);
-            });
-        })
-        .catch(err => console.log(err));
+    .catch(err => console.log(err));
 }
 
 // setInterval(() => {
-//     factomBitcoinTX()
+    // factomBitcoinTX()
 // }, 600000)
 
-CallHarm = () => {
-    axios({
-        method: "GET",
-        url: "https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks",
-        headers: {
-            "Content-Type": "application/json",
-            "app_id": "c6bd4cff",
-            "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+CheckDataBase = () => {
+  mongoose.connection.db.collection('factomblocks').count(function(err, count) {
+    console.log("DB count err? ",err)
+    if (count <= 20) {
+      axios({
+        method: "POST",
+        url: `http://ec2-3-16-108-148.us-east-2.compute.amazonaws.com:8088/v2`,
+        data: {
+          jsonrpc: "2.0",
+          id: 0,
+          method: "heights"
         }
-    }).then(res => {
-        console.log("Harmony Call", res.data)
-    })
+      }).then(res => {
+        console.log("height", res.data.result.leaderheight)
+        // SingleBlock(res.data.result.leaderheight)
+      }).catch(errH => console.log("errH ", errH))
+    }
+  })
 }
 
-// CallHarm()
+CallHarm = () => {
+  axios({
+    method: "GET",
+    url: "https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks",
+    headers: {
+      "Content-Type": "application/json",
+      "app_id": "c6bd4cff",
+      "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+    }
+  }).then(res => {
+    res.data.data.forEach(block => {
+      let SaveBlock = new FactomBlocks({
+        height: block.height,
+        keymr: block.keymr,
+        href: block.href,
+        started_at: block.started_at 
+      })
+      SaveBlock.save().then(() => {
+        
+      }).catch(() => null);
+    });
+  })
+}
+
+CallHarm()
+
+// SingleBlock = (height) => {
+//   console.log("Height in SingleBlock ", height)
+//   for (let i = 0; i <= height; i++) {
+//     axios({
+//       method: "GET",
+//       url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${i}`,
+//       headers: {
+//         "Content-Type": "application/json",
+//         "app_id": "c6bd4cff",
+//         "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+//       }
+//     }).then(res => {
+//       // console.log(res.data)
+//       let SaveBlock = new FactomBlocks({
+//         height: res.data.data.height,
+//         keymr: res.data.data.keymr,
+//         started_at: res.data.data.started_at 
+//       })
+//       SaveBlock.save().then(() => {
+        
+//       }).catch(() => null);
+//     }).catch(err => console.log(err))
+//   }
+// }
+
+// SingleBlock();
