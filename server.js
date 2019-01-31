@@ -10,7 +10,7 @@ const FactomBlocks = require('./models/BlocksFromHarmony');
 mongoose.connect(process.env.DATABASE, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 mongoose.connection
-  .on('connected', () => { CheckDataBase() })
+  .on('connected', () => { console.log(`Connected to database`), CallHarm() })
   .on('error', (err) => { console.log(`Connection error: ${err.message}`) });
 
 
@@ -58,35 +58,35 @@ client.onclose = function() {
 client.onmessage = function(e) {
   if (typeof e.data === 'string') {
     console.log("Received: '" + e.data + "'");
-    axios({
-      method: "post",
-      url:
-        "https://hooks.slack.com/services/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",
-      headers: { "Content-type": "application/json" },
-      data: {
-        text: "",
-        attachments: [
-          {
-            fields: [
-              {
-                title: `FROM THE FREAKING SOCKET`,
-                short: true
-              }
-            ],
-            color: "#FFB233",
-            text: `Last Trans Info: ${
-              e.data
-            } `
-          }
-        ]
-      }
-    })
-      .then(res => {
-        console.log("From socket to Slack")
-      })
-      .catch(err => {
-        console.log("Or THIS??", err);
-      });
+    // axios({
+    //   method: "post",
+    //   url:
+    //     "https://hooks.slack.com/services/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",
+    //   headers: { "Content-type": "application/json" },
+    //   data: {
+    //     text: "",
+    //     attachments: [
+    //       {
+    //         fields: [
+    //           {
+    //             title: `FROM THE FREAKING SOCKET`,
+    //             short: true
+    //           }
+    //         ],
+    //         color: "#FFB233",
+    //         text: `Last Trans Info: ${
+    //           e.data
+    //         } `
+    //       }
+    //     ]
+    //   }
+    // })
+    //   .then(res => {
+    //     console.log("From socket to Slack")
+    //   })
+    //   .catch(err => {
+    //     console.log("Or THIS??", err);
+    //   });
   }
 };
 
@@ -134,25 +134,18 @@ factomBitcoinTX = () => {
     // factomBitcoinTX()
 // }, 600000)
 
-CheckDataBase = () => {
-  mongoose.connection.db.collection('factomblocks').count(function(err, count) {
-    console.log("DB count err? ",err)
-    if (count <= 20) {
-      axios({
-        method: "POST",
-        url: `http://ec2-3-16-108-148.us-east-2.compute.amazonaws.com:8088/v2`,
-        data: {
-          jsonrpc: "2.0",
-          id: 0,
-          method: "heights"
-        }
-      }).then(res => {
-        console.log("height", res.data.result.leaderheight)
-        // SingleBlock(res.data.result.leaderheight)
-      }).catch(errH => console.log("errH ", errH))
-    }
+FindSmallest = () => {
+  FactomBlocks.find({}, (err, data) => {
+    let sorted = data.sort((a,b) => {
+      return a.height-b.height
+    })
+    SingleBlock(sorted[0].height);
   })
 }
+
+setInterval(() => {
+  FindSmallest()
+}, 60000)
 
 CallHarm = () => {
   axios({
@@ -168,7 +161,6 @@ CallHarm = () => {
       let SaveBlock = new FactomBlocks({
         height: block.height,
         keymr: block.keymr,
-        href: block.href,
         started_at: block.started_at 
       })
       SaveBlock.save().then(() => {
@@ -177,32 +169,31 @@ CallHarm = () => {
     });
   })
 }
+setInterval(() => {
+  CallHarm()
+}, 300000)
 
-CallHarm()
-
-// SingleBlock = (height) => {
-//   console.log("Height in SingleBlock ", height)
-//   for (let i = 0; i <= height; i++) {
-//     axios({
-//       method: "GET",
-//       url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${i}`,
-//       headers: {
-//         "Content-Type": "application/json",
-//         "app_id": "c6bd4cff",
-//         "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
-//       }
-//     }).then(res => {
-//       // console.log(res.data)
-//       let SaveBlock = new FactomBlocks({
-//         height: res.data.data.height,
-//         keymr: res.data.data.keymr,
-//         started_at: res.data.data.started_at 
-//       })
-//       SaveBlock.save().then(() => {
+SingleBlock = (height) => {
+  console.log("Height in SingleBlock ", height)
+    axios({
+      method: "GET",
+      url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${height-1}`,
+      headers: {
+        "Content-Type": "application/json",
+        "app_id": "c6bd4cff",
+        "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+      }
+    }).then(res => {
+      console.log(res.data)
+      let SaveBlock = new FactomBlocks({
+        height: res.data.data.height,
+        keymr: res.data.data.keymr,
+        started_at: res.data.data.started_at 
+      })
+      SaveBlock.save().then(() => {
         
-//       }).catch(() => null);
-//     }).catch(err => console.log(err))
-//   }
-// }
+      }).catch(() => null);
+    }).catch(err => console.log(err))
+}
 
 // SingleBlock();
