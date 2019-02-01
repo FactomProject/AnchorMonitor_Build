@@ -13,6 +13,33 @@ const FactomBlocksSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
+    btc_hash: {
+        type: String,
+        unique: true,
+    },
 });
+
+const BlockchainAddSocket = new mongoose.Schema({
+    script: {
+        type: Number,
+        unique: true,
+    },
+    keymr: {
+        type: String,
+        unique: true,
+    }, 
+    height: {
+        type: Number,
+        unique: true,
+    }, 
+    btc_trans_hash: {
+        type: String,
+        unique: true,
+    }, 
+    time: {
+        type: Number,
+        unique: false,
+    },
+})
 
 module.exports = mongoose.model('FactomBlocks', FactomBlocksSchema)

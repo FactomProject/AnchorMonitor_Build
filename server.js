@@ -90,6 +90,52 @@ client.onmessage = function(e) {
   }
 };
 
+let Last_Trans_Info = 
+{
+  "op" : "utx",
+  "x" : {
+    "lock_time" : 0,
+    "ver" : 2,
+    "size" : 242,
+    "inputs" : [ {
+      "sequence" : 4294967295,
+      "prev_out" : {
+        "spent" : true,
+        "tx_index" : 411017513,
+        "type" : 0,
+        "addr" : "1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF",
+        "value" : 65252,
+        "n" : 0,
+        "script" : "76a914c5b7fd920dce5f61934e792c7e6fcc829aff533d88ac"
+      },
+      "script" : "47304402204afa3a019ea2c63f18db6da819b842463e0b36075f86ea51c01169e0870e932502206c60e31e6839655270dd5daffbd0e8a3610ef66818d05b296de4e89b828a7ad80121027e706cd1c919431b693a0247e4a239e632659a8723a621a91ec610c64f4173ac"
+    } ],
+    "time" : 1548873213,
+    "tx_index" : 411020389,
+    "vin_sz" : 1,
+    "hash" : "0faf1806b60221e7a3b2361be04720156d8d85dbedd853bb0d2abfbd2f9b48db",
+    "vout_sz" : 2,
+    "relayed_by" : "0.0.0.0",
+    "out" : [ {
+      "spent" : false,
+      "tx_index" : 411020389,
+      "type" : 0,
+      "addr" : "1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF",
+      "value" : 62822,
+      "n" : 0,
+      "script" : "76a914c5b7fd920dce5f61934e792c7e6fcc829aff533d88ac"
+    }, {
+      "spent" : false,
+      "tx_index" : 411020389,
+      "type" : 0,
+      "addr" : null,
+      "value" : 0,
+      "n" : 1,
+      "script" : "6a28466100000002b5f0445aa21d85aeb1ea98fbcf135d6e703681d248ca77313b9871f99ae8e9acf9b2"
+    } ]
+  }
+ }
+
 factomBitcoinTX = () => {
   axios({
     method: "get",
@@ -139,13 +185,13 @@ FindSmallest = () => {
     let sorted = data.sort((a,b) => {
       return a.height-b.height
     })
-    SingleBlock(sorted[0].height);
+    // SingleBlock(sorted[0].height);
   })
 }
 
 setInterval(() => {
   FindSmallest()
-}, 60000)
+}, 300000)
 
 CallHarm = () => {
   axios({
@@ -167,11 +213,11 @@ CallHarm = () => {
         
       }).catch(() => null);
     });
-  })
+  }).catch(err => console.log("CallHarm ERROR", err.response.data))
 }
-setInterval(() => {
-  CallHarm()
-}, 300000)
+// setInterval(() => {
+//   CallHarm()
+// }, 300000)
 
 SingleBlock = (height) => {
   console.log("Height in SingleBlock ", height)
@@ -193,7 +239,7 @@ SingleBlock = (height) => {
       SaveBlock.save().then(() => {
         
       }).catch(() => null);
-    }).catch(err => console.log(err))
+    }).catch(err => console.log("SingleBlock ERROR", err.data))
 }
 
 // SingleBlock();
