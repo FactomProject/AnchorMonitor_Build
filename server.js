@@ -33,14 +33,14 @@ app.use('/graphql', express_graphql({
   graphiql: true
 }));
 let vep = app.listen(5001, () => console.log(`Express GraphQL Server Now Running On ${vep.address().port}`));
-    
+
 // Socket to listen to Factoms address on Blockchain.com
-let client = new W3CWebSocket('wss://ws.blockchain.info/inv');    
-client.onerror = function() {
+let client = new W3CWebSocket('wss://ws.blockchain.info/inv');
+client.onerror = function () {
   console.log('Connection Error');
 };
-    
-client.onopen = function() {
+
+client.onopen = function () {
   console.log('WebSocket Client Connected');
 
   function sendNumber() {
@@ -50,12 +50,12 @@ client.onopen = function() {
   }
   sendNumber();
 };
- 
-client.onclose = function() {
+
+client.onclose = function () {
   console.log('echo-protocol Client Closed');
 };
- 
-client.onmessage = function(e) {
+
+client.onmessage = function (e) {
   if (typeof e.data === 'string') {
     console.log("Received: '" + e.data + "'");
     // axios({
@@ -90,51 +90,51 @@ client.onmessage = function(e) {
   }
 };
 
-let Last_Trans_Info = 
-{
-  "op" : "utx",
-  "x" : {
-    "lock_time" : 0,
-    "ver" : 2,
-    "size" : 242,
-    "inputs" : [ {
-      "sequence" : 4294967295,
-      "prev_out" : {
-        "spent" : true,
-        "tx_index" : 411017513,
-        "type" : 0,
-        "addr" : "1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF",
-        "value" : 65252,
-        "n" : 0,
-        "script" : "76a914c5b7fd920dce5f61934e792c7e6fcc829aff533d88ac"
-      },
-      "script" : "47304402204afa3a019ea2c63f18db6da819b842463e0b36075f86ea51c01169e0870e932502206c60e31e6839655270dd5daffbd0e8a3610ef66818d05b296de4e89b828a7ad80121027e706cd1c919431b693a0247e4a239e632659a8723a621a91ec610c64f4173ac"
-    } ],
-    "time" : 1548873213,
-    "tx_index" : 411020389,
-    "vin_sz" : 1,
-    "hash" : "0faf1806b60221e7a3b2361be04720156d8d85dbedd853bb0d2abfbd2f9b48db",
-    "vout_sz" : 2,
-    "relayed_by" : "0.0.0.0",
-    "out" : [ {
-      "spent" : false,
-      "tx_index" : 411020389,
-      "type" : 0,
-      "addr" : "1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF",
-      "value" : 62822,
-      "n" : 0,
-      "script" : "76a914c5b7fd920dce5f61934e792c7e6fcc829aff533d88ac"
-    }, {
-      "spent" : false,
-      "tx_index" : 411020389,
-      "type" : 0,
-      "addr" : null,
-      "value" : 0,
-      "n" : 1,
-      "script" : "6a28466100000002b5f0445aa21d85aeb1ea98fbcf135d6e703681d248ca77313b9871f99ae8e9acf9b2"
-    } ]
+let Last_Trans_Info =
+  {
+    "op": "utx",
+    "x": {
+      "lock_time": 0,
+      "ver": 2,
+      "size": 242,
+      "inputs": [{
+        "sequence": 4294967295,
+        "prev_out": {
+          "spent": true,
+          "tx_index": 411017513,
+          "type": 0,
+          "addr": "1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF",
+          "value": 65252,
+          "n": 0,
+          "script": "76a914c5b7fd920dce5f61934e792c7e6fcc829aff533d88ac"
+        },
+        "script": "47304402204afa3a019ea2c63f18db6da819b842463e0b36075f86ea51c01169e0870e932502206c60e31e6839655270dd5daffbd0e8a3610ef66818d05b296de4e89b828a7ad80121027e706cd1c919431b693a0247e4a239e632659a8723a621a91ec610c64f4173ac"
+      }],
+      "time": 1548873213,
+      "tx_index": 411020389,
+      "vin_sz": 1,
+      "hash": "0faf1806b60221e7a3b2361be04720156d8d85dbedd853bb0d2abfbd2f9b48db",
+      "vout_sz": 2,
+      "relayed_by": "0.0.0.0",
+      "out": [{
+        "spent": false,
+        "tx_index": 411020389,
+        "type": 0,
+        "addr": "1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF",
+        "value": 62822,
+        "n": 0,
+        "script": "76a914c5b7fd920dce5f61934e792c7e6fcc829aff533d88ac"
+      }, {
+        "spent": false,
+        "tx_index": 411020389,
+        "type": 0,
+        "addr": null,
+        "value": 0,
+        "n": 1,
+        "script": "6a28466100000002b5f0445aa21d85aeb1ea98fbcf135d6e703681d248ca77313b9871f99ae8e9acf9b2"
+      }]
+    }
   }
- }
 
 factomBitcoinTX = () => {
   axios({
@@ -177,13 +177,13 @@ factomBitcoinTX = () => {
 }
 
 // setInterval(() => {
-    // factomBitcoinTX()
+// factomBitcoinTX()
 // }, 600000)
 
 FindSmallest = () => {
   FactomBlocks.find({}, (err, data) => {
-    let sorted = data.sort((a,b) => {
-      return a.height-b.height
+    let sorted = data.sort((a, b) => {
+      return a.height - b.height
     })
     // SingleBlock(sorted[0].height);
   })
@@ -203,43 +203,48 @@ CallHarm = () => {
       "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
     }
   }).then(res => {
+    console.log(res.data.data)
     res.data.data.forEach(block => {
       let SaveBlock = new FactomBlocks({
         height: block.height,
         keymr: block.keymr,
-        started_at: block.started_at 
+        started_at: block.started_at,
       })
       SaveBlock.save().then(() => {
-        
-      }).catch(() => null);
+        console.log("saved")
+      }).catch(err => console.log("save error", err));
     });
   }).catch(err => console.log("CallHarm ERROR", err.response.data))
 }
-// setInterval(() => {
-//   CallHarm()
-// }, 300000)
+setInterval(() => {
+  CallHarm()
+}, 300000)
 
 SingleBlock = (height) => {
   console.log("Height in SingleBlock ", height)
-    axios({
-      method: "GET",
-      url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${height-1}`,
-      headers: {
-        "Content-Type": "application/json",
-        "app_id": "c6bd4cff",
-        "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
-      }
-    }).then(res => {
-      console.log(res.data)
-      let SaveBlock = new FactomBlocks({
-        height: res.data.data.height,
-        keymr: res.data.data.keymr,
-        started_at: res.data.data.started_at 
-      })
-      SaveBlock.save().then(() => {
-        
-      }).catch(() => null);
-    }).catch(err => console.log("SingleBlock ERROR", err.data))
+  axios({
+    method: "GET",
+    url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${height - 1}`,
+    headers: {
+      "Content-Type": "application/json",
+      "app_id": "c6bd4cff",
+      "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+    }
+  }).then(res => {
+    console.log(res.data)
+    let SaveBlock = new FactomBlocks({
+      height: res.data.data.height,
+      keymr: res.data.data.keymr,
+      started_at: res.data.data.started_at
+    })
+    SaveBlock.save().then(() => {
+
+    }).catch(() => null);
+  }).catch(err => console.log("SingleBlock ERROR", err.data))
 }
 
 // SingleBlock();
+
+CheckingBlockchainforKEYMR = () => {
+  
+}

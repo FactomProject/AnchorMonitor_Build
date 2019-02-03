@@ -16,6 +16,7 @@ const FactomBlocksSchema = new mongoose.Schema({
     btc_hash: {
         type: String,
         unique: true,
+        sparse: true,
     },
 });
 
@@ -27,15 +28,15 @@ const BlockchainAddSocket = new mongoose.Schema({
     keymr: {
         type: String,
         unique: true,
-    }, 
+    },
     height: {
         type: Number,
         unique: true,
-    }, 
+    },
     btc_trans_hash: {
         type: String,
         unique: true,
-    }, 
+    },
     time: {
         type: Number,
         unique: false,
