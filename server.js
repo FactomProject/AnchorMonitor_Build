@@ -5,15 +5,14 @@ const axios = require("axios");
 var W3CWebSocket = require('websocket').w3cwebsocket;
 require('dotenv').config();
 const mongoose = require('mongoose');
-const FactomBlocks = require('./models/BlocksFromHarmony');
+const FactomBlocks = require('./models/FactomBlocksSchema');
+const BlockchainDOTcom = require('./models/BlockchainDOTcomSchema');
 
 mongoose.connect(process.env.DATABASE, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 mongoose.connection
-  .on('connected', () => { console.log(`Connected to database`), CallHarm() })
+  .on('connected', () => { console.log(`Connected to database`)/*, CallHarm()*/ })
   .on('error', (err) => { console.log(`Connection error: ${err.message}`) });
-
-
 
 // GraphQL schema
 var schema = buildSchema(`
@@ -35,10 +34,11 @@ app.use('/graphql', express_graphql({
 let vep = app.listen(5001, () => console.log(`Express GraphQL Server Now Running On ${vep.address().port}`));
 
 // Socket to listen to Factoms address on Blockchain.com
-let client = new W3CWebSocket('wss://ws.blockchain.info/inv');
-client.onerror = function () {
-  console.log('Connection Error');
-};
+setupWebSocket = () => {
+  let client = new W3CWebSocket('wss://ws.blockchain.info/inv');
+  client.onerror = function () {
+    console.log('Connection Error');
+  };
 
 client.onopen = function () {
   console.log('WebSocket Client Connected');
@@ -48,47 +48,57 @@ client.onopen = function () {
       client.send(`{"op":"addr_sub", "addr":"1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF"}`);
     }
   }
+  setInterval(() => {
+    sendNumber();
+  }, 300000)
+
   sendNumber();
-};
+  };
 
-client.onclose = function () {
-  console.log('echo-protocol Client Closed');
-};
+  client.onclose = function () {
+    console.log('echo-protocol Client Closed WHYYYYYYY');
+    setTimeout(setupWebSocket, 1000)
+  };
 
-client.onmessage = function (e) {
-  if (typeof e.data === 'string') {
-    console.log("Received: '" + e.data + "'");
-    // axios({
-    //   method: "post",
-    //   url:
-    //     "https://hooks.slack.com/services/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",
-    //   headers: { "Content-type": "application/json" },
-    //   data: {
-    //     text: "",
-    //     attachments: [
-    //       {
-    //         fields: [
-    //           {
-    //             title: `FROM THE FREAKING SOCKET`,
-    //             short: true
-    //           }
-    //         ],
-    //         color: "#FFB233",
-    //         text: `Last Trans Info: ${
-    //           e.data
-    //         } `
-    //       }
-    //     ]
-    //   }
-    // })
-    //   .then(res => {
-    //     console.log("From socket to Slack")
-    //   })
-    //   .catch(err => {
-    //     console.log("Or THIS??", err);
-    //   });
-  }
-};
+  client.onmessage = function (e) {
+    CallHarm();
+    setTimeout(() => {
+      if (typeof e.data === 'string') {
+        let obj = JSON.parse(e.data);
+        let outScript = obj.x.out[1].script;
+        let keyMR = outScript.substring(outScript.length-64, outScript.length);
+        let height = parseInt(outScript.substring(12, 20), 16);
+        let transHash = obj.x.hash;
+        let time = obj.x.time;
+  
+        console.log("Output script: ", outScript);
+        console.log("KeyMR: ", keyMR);
+        console.log("Height: ",  height);
+        console.log("BTC TRANS HASH: ", transHash);
+        console.log("Time: ", time);
+  
+        let SaveData = new BlockchainDOTcom({
+          script: outScript,
+          keymr: keyMR,
+          height: height,
+          btc_trans_hash: transHash,
+          time: time,
+        })
+        SaveData.save().then(() => {
+          console.log("saved BlockchainDOTcom")
+          FactomBlocks.findOneAndUpdate({keymr: keyMR}, {btc_hash: transHash},(err, data) => {
+            err ? console.log("Err in find", err) :
+            console.log("FOUND IT: ", data)
+            // data.btc_hash = transHash;
+            // data.save();
+          })
+        }).catch(err => console.log("BlockchainDOTcom Save Error: ", err));
+      }
+    }, 1000)
+  };
+}
+
+setupWebSocket();
 
 let Last_Trans_Info =
   {
@@ -203,7 +213,7 @@ CallHarm = () => {
       "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
     }
   }).then(res => {
-    console.log(res.data.data)
+    // console.log(res.data.data)
     res.data.data.forEach(block => {
       let SaveBlock = new FactomBlocks({
         height: block.height,
@@ -211,10 +221,10 @@ CallHarm = () => {
         started_at: block.started_at,
       })
       SaveBlock.save().then(() => {
-        console.log("saved")
-      }).catch(err => console.log("save error", err));
+        console.log("saved FactomBlocks")
+      }).catch(err => err.code === 11000 ? null : console.log("FactomBlocks Save Error: ", err));
     });
-  }).catch(err => console.log("CallHarm ERROR", err.response.data))
+  }).catch(err => console.log("CallHarm ERROR", err.response))
 }
 setInterval(() => {
   CallHarm()
@@ -231,7 +241,7 @@ SingleBlock = (height) => {
       "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
     }
   }).then(res => {
-    console.log(res.data)
+    // console.log(res.data)
     let SaveBlock = new FactomBlocks({
       height: res.data.data.height,
       keymr: res.data.data.keymr,
