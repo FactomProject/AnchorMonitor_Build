@@ -11,11 +11,14 @@ export default () => (
         </div>
         <style jsx>{`
             .Hero {
-                background: url('../images/wallpaper3.jpg');
-                height: 920px;
                 background-size: cover;
                 background-position: center;
-                position: relative;
+                grid-area: table;
+                border-radius: 0.4rem;
+                z-index: 1;
+                background: #FFF;
+                -webkit-box-shadow: 0 0 8px 0 rgba(0,0,0, 0.12);
+                box-shadow: 0 0 8px 0 rgba(0,0,0, 0.9);
             }
             .HeroGroup {
                 margin: 0 auto;
@@ -59,11 +62,11 @@ export default () => (
                 .HeroGroup {
                     padding: 100px 20px;
                 }
-
+            
                 .Hero h1 {
                     font-size: 40px;
                 }
-
+            
                 .Hero p {
                     font-size: 24px;
                 }
@@ -73,7 +76,7 @@ export default () => (
                     opacity: 0;
                     transform: translateY(20px);
                 }
-
+            
                 100% {
                     opacity: 1;
                     transform: translateY(0px);
