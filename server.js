@@ -161,7 +161,6 @@ CallHarm = () => {
       "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
     }
   }).then(res => {
-    // console.log(res.data.data)
     res.data.data.forEach(block => {
       let SaveBlock = new FactomBlocks({
         height: block.height,
@@ -189,7 +188,6 @@ SingleBlock = (height) => {
       "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
     }
   }).then(res => {
-    // console.log(res.data)
     let SaveBlock = new FactomBlocks({
       height: res.data.data.height,
       keymr: res.data.data.keymr,
@@ -224,7 +222,7 @@ setInterval(() => {
 CheckSavedBitcoinMessages5minutes = () => {
   BlockchainDOTcom.find({}, (err, data) => {
     let sorted = data.sort((a, b) => {
-      return a.height - b.height
+      return b.height - a.height
     })
     for (let i = 0; i <= 10; i++) {
       FactomBlocks.findOneAndUpdate({keymr: sorted[i].keymr}, {btc_hash: sorted[i].btc_trans_hash},(err, data) => {
