@@ -255,6 +255,20 @@ SingleBlock = (height) => {
 
 // SingleBlock();
 
-CheckingBlockchainforKEYMR = () => {
-  
+CheckSavedBitcoinMessages = () => {
+  BlockchainDOTcom.find({}, (err, data) => {
+    let sorted = data.sort((a, b) => {
+      return a.height - b.height
+    })
+    for (let i = 0; i <= sorted.length-1; i++) {
+      FactomBlocks.findOneAndUpdate({keymr: sorted[i].keymr}, {btc_hash: sorted[i].btc_trans_hash},(err, data) => {
+        err ? console.log("Err in find", err) :
+        console.log("FOUND IT: ", data)
+      })
+    }
+  })
 }
+
+setInterval(() => {
+  CheckSavedBitcoinMessages()
+}, 3600000)

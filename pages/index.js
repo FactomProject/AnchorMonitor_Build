@@ -2,11 +2,12 @@ import Link from 'next/link'
 import Factom from '../assets/factom_horizontal_white'
 import Layout from '../components/Layout'
 
-export default () => (
-    <Layout>
+export default props => (
+    console.log(props.url.query.title),
+    <Layout title='Bitcoin Anchors'>
         <div className="Hero">
             <div className="HeroGroup">
-                <h1>Hello Wold.</h1>
+                <h1>Pending {props.url.query.title} Anchors</h1>
             </div>
         </div>
         <style jsx>{`

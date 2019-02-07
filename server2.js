@@ -1,83 +1,58 @@
-var express = require('express');
-var express_graphql = require('express-graphql');
-var { buildSchema } = require('graphql');
-// GraphQL schema
-var schema = buildSchema(`
-    type Query {
-        course(id: Int!): Course
-        courses(topic: String): [Course]
-    },
-    type Mutation {
-        updateCourseTopic(id: Int!, topic: String!): Course
-    },
-    type Course {
-        id: Int
-        title: String
-        author: String
-        description: String
-        topic: String
-        url: String
-    }
-`);
-var coursesData = [
-    {
-        id: 1,
-        title: 'The Complete Node.js Developer Course',
-        author: 'Andrew Mead, Rob Percival',
-        description: 'Learn Node.js by building real-world applications with Node, Express, MongoDB, Mocha, and more!',
-        topic: 'Node.js',
-        url: 'https://codingthesmartway.com/courses/nodejs/'
-    },
-    {
-        id: 2,
-        title: 'Node.js, Express & MongoDB Dev to Deployment',
-        author: 'Brad Traversy',
-        description: 'Learn by example building & deploying real-world Node.js applications from absolute scratch',
-        topic: 'Node.js',
-        url: 'https://codingthesmartway.com/courses/nodejs-express-mongodb/'
-    },
-    {
-        id: 3,
-        title: 'JavaScript: Understanding The Weird Parts',
-        author: 'Anthony Alicea',
-        description: 'An advanced JavaScript course for everyone! Scope, closures, prototypes, this, build your own framework, and more.',
-        topic: 'JavaScript',
-        url: 'https://codingthesmartway.com/courses/understand-javascript/'
-    }
-]
-var getCourse = function(args) { 
-    var id = args.id;
-    return coursesData.filter(course => {
-        return course.id == id;
-    })[0];
-}
-var getCourses = function(args) {
-    if (args.topic) {
-        var topic = args.topic;
-        return coursesData.filter(course => course.topic === topic);
-    } else {
-        return coursesData;
-    }
-}
-var updateCourseTopic = function({id, topic}) {
-    coursesData.map(course => {
-        if (course.id === id) {
-            course.topic = topic;
-            return course;
-        }
+const { createServer } = require('http')
+const { parse } = require('url')
+const next = require('next')
+const express = require('express')
+
+const dev = process.env.NODE_ENV !== 'production'
+const app = next({ dev })
+const handle = app.getRequestHandler()
+
+app.prepare().then(() => {
+//   createServer((req, res) => {
+//     const parsedUrl = parse(req.url, true)
+//     const { pathname, query } = parsedUrl
+
+//     if (pathname === '/') {
+//         app.render(req, res, '/', {title: "BTC"})
+//     } else if (pathname === '/BTC') {
+//         app.render(req, res, '/', {title: "BTC"})
+//     } else if (pathname === '/ETH') {
+//         app.render(req, res, '/', {title: "ETH"})
+//     } else {
+//         handle(req, res, parsedUrl)
+//     }
+//   }).listen(3000, err => {
+//     if (err) throw err
+//     console.log('> Ready on http://localhost:3000')
+//   })
+
+    const server = express();
+
+    server.get('/', (req, res) => {
+        console.log("/req.params", req.params)
+        console.log("/req.query", req.query)
+
+        return app.render(req, res, '/', {title: "BTC"})
+    })
+    server.get('/BTC', (req, res) => {
+        console.log("/BTC req.params", req.params)
+        console.log("/BTC req.query", req.query)
+
+        return app.render(req, res, '/', {title: "BTC"})
+    })
+    server.get('/ETH', (req, res) => {
+        console.log("/ETH req.params", req.params)
+        console.log("/ETH req.query", req.query)
+
+        return app.render(req, res, '/', {title: "ETH"})
+    })
+
+    server.get('*', (req, res) => {
+        return handle(req, res);
     });
-    return coursesData.filter(course => course.id === id) [0];
-}
-var root = {
-    course: getCourse,
-    courses: getCourses,
-    updateCourseTopic: updateCourseTopic
-};
-// Create an express server and a GraphQL endpoint
-var app = express();
-app.use('/graphql', express_graphql({
-    schema: schema,
-    rootValue: root,
-    graphiql: true
-}));
-app.listen(4000, () => console.log('Express GraphQL Server Now Running On localhost:4000/graphql'));
+
+    server.listen(3000, err => {
+        if (err) throw err;
+        console.log(`${'\u2705'}  Ready on http://localhost:3000`);
+    });
+})

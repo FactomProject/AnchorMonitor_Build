@@ -11,7 +11,7 @@ export default ({ children, title = 'This is the default title' }) => (
         </Head>
         <header className="Header">
             <nav className="HeaderGroup">
-                <Link href='/'>
+                <Link as="/BTC" href={`/?title=BTC`}>
                     <a className="FactomIcon">
                         <h1><FactomIcon />
                             <span style={{display: "none"}}>Factom Anchor Monitor</span>
@@ -19,12 +19,12 @@ export default ({ children, title = 'This is the default title' }) => (
                     </a>
                 </Link>
                 <div className="BTCorETH">
-                    <Link href="/about">
+                    <Link as="/BTC" href={`/?title=BTC`}>
                         <a>
                             BTC
                         </a>
                     </Link>
-                    <Link href="/about">
+                    <Link as="/ETH" href={`/?title=ETH`}>
                         <a>
                             ETH
                         </a>
@@ -53,7 +53,7 @@ export default ({ children, title = 'This is the default title' }) => (
         <style jsx>{`
             .PageLayout {
                 display: grid;
-                grid-template-columns: .8fr 1fr 1fr 1fr .8fr;
+                grid-template-columns: .3fr 1fr 1fr 1fr .3fr;
                 grid-template-rows:  7rem 75vh 1fr;
                 grid-template-areas: 
                 ". mainheader mainheader mainheader ."
@@ -74,11 +74,13 @@ export default ({ children, title = 'This is the default title' }) => (
             .HeaderGroup {
                 margin: 0 auto;
                 display: grid;
-                grid-template:
+                grid-template-columns: .3fr 1fr 1fr 1fr .3fr;
+
+                grid-template-areas:
                 '. header .  menu .';
                 grid-gap: 10px;
                 padding: 10px;
-                padding-top:20px;
+                padding-top:30px;
                 align-items: center;
                 justify-items: center;
                 justify-self: center;
@@ -94,7 +96,7 @@ export default ({ children, title = 'This is the default title' }) => (
                 justify-self: start;
             }
             .FactomIcon h1 {
-                margin: 9px 0 6px 0;
+                margin: 9px 0 0 0;
             }
             .BTCorETH {
                 display: grid;
