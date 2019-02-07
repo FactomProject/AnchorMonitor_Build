@@ -11,7 +11,7 @@ export default ({ children, title = 'This is the default title' }) => (
         </Head>
         <header className="Header">
             <nav className="HeaderGroup">
-                <Link as="/BTC" href={`/?title=BTC`}>
+                <Link href={`/BTC`}>
                     <a className="FactomIcon">
                         <h1><FactomIcon />
                             <span style={{display: "none"}}>Factom Anchor Monitor</span>
@@ -19,12 +19,12 @@ export default ({ children, title = 'This is the default title' }) => (
                     </a>
                 </Link>
                 <div className="BTCorETH">
-                    <Link as="/BTC" href={`/?title=BTC`}>
+                    <Link href={`/BTC`}>
                         <a>
                             BTC
                         </a>
                     </Link>
-                    <Link as="/ETH" href={`/?title=ETH`}>
+                    <Link href={`/ETH`}>
                         <a>
                             ETH
                         </a>
