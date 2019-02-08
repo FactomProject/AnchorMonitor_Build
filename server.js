@@ -11,7 +11,7 @@ const BlockchainDOTcom = require('./models/BlockchainDOTcomSchema');
 mongoose.connect(process.env.DATABASE, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 mongoose.connection
-  .on('connected', () => { console.log(`Connected to database`)/*, CallHarm()*/ })
+  .on('connected', () => { console.log(`Connected to database`), CallHarm() })
   .on('error', (err) => { console.log(`Connection error: ${err.message}`) });
 
 // GraphQL schema
@@ -147,11 +147,12 @@ FindSmallest = () => {
   })
 }
 
-setInterval(() => {
-  FindSmallest()
-}, 300000)
+//setInterval(() => {
+  //FindSmallest()
+//}, 300000)
 
 CallHarm = () => {
+  console.log("Called CallHarm")
   axios({
     method: "GET",
     url: "https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks",
@@ -202,6 +203,7 @@ SingleBlock = (height) => {
 // SingleBlock();
 
 CheckSavedBitcoinMessages = () => {
+  console.log("Called CheckSavedBitcoinMessages")
   BlockchainDOTcom.find({}, (err, data) => {
     let sorted = data.sort((a, b) => {
       return a.height - b.height
@@ -220,12 +222,14 @@ setInterval(() => {
 }, 3600000)
 
 CheckSavedBitcoinMessages5minutes = () => {
+  console.log("Called CheckSavedBitcoinMessages5minutes");
   BlockchainDOTcom.find({}, (err, data) => {
     let sorted = data.sort((a, b) => {
       return b.height - a.height
     })
     if (sorted.length < 10) {
-      for (let i = 0; i <= sorted.length; i++) {
+      for (let i = 0; i <= sorted.length-1; i++) {
+	console.log("sorted[i] in < 10 for loop: ", sorted[i])
         FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
           err ? console.log("Err in find", err) :
             console.log("FOUND IT: ", data)
