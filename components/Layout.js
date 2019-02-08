@@ -14,7 +14,7 @@ export default ({ children, title = 'This is the default title' }) => (
                 <Link href={`/BTC`}>
                     <a className="FactomIcon">
                         <h1><FactomIcon />
-                            <span style={{display: "none"}}>Factom Anchor Monitor</span>
+                            <span style={{ display: "none" }}>Factom Anchor Monitor</span>
                         </h1>
                     </a>
                 </Link>
@@ -54,7 +54,7 @@ export default ({ children, title = 'This is the default title' }) => (
             .PageLayout {
                 display: grid;
                 grid-template-columns: .3fr 1fr 1fr 1fr .3fr;
-                grid-template-rows:  7rem 75vh 1fr;
+                grid-template-rows:  7rem minmax(100px, 980px) 1fr;
                 grid-template-areas: 
                 ". mainheader mainheader mainheader ."
                 ". table table table ."
@@ -72,6 +72,7 @@ export default ({ children, title = 'This is the default title' }) => (
                 transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
             }
             .HeaderGroup {
+                grid-area: table;
                 margin: 0 auto;
                 display: grid;
                 grid-template-columns: .3fr 1fr 1fr 1fr .3fr;

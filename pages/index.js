@@ -61,10 +61,10 @@ export default class extends Component {
                     .HeroGroup {
                         margin: 0 auto;
                         // max-width: 500px;
-                        padding: 2rem;
+                        padding: 3rem 3.5rem;
                         display: grid;
                             grid-template-columns: 1fr;
-                            grid-template-rows:  5rem 65vh 2fr;
+                            grid-template-rows:  5rem minmax(300px, 780px) 2fr;
                             grid-template-areas: 
                             "tableheader"
                             "tablebody"
@@ -114,9 +114,13 @@ export default class extends Component {
                         text-align: left;
                         white-space: nowrap;
                     }
+                    table thead,
+                    table tbody {
+                        display: grid;
+                    }
                     table  tr {
                         display: grid;
-                        grid-template-columns: 8rem 1fr 1fr;
+                        grid-template-columns: minmax(100px, 200px) minmax(100px, 300px) minmax(100px, 1fr);
                         grid-template-areas: " colheight coltime colkeymr";
                     }
                     table thead th {
@@ -141,6 +145,8 @@ export default class extends Component {
                     tbody td {
                         font-size: 60%;
                         padding: 1.5rem;
+                        color: #4A4A4A;
+                        border-bottom: 1px solid #E9E9E9;
                     }
                     tbody td:not(:first-child) {
                         padding-left: 0 !important;
