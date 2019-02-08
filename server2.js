@@ -46,7 +46,7 @@ app.prepare().then(() => {
   })
 
   server.get('/ETH', (req, res) => {
-    return app.render(req, res, '/', { name: "ETH" })
+    return app.render(req, res, '/', { name: "ETH", data: "Coming Soon..." })
   })
 
   server.get('*', (req, res) => {

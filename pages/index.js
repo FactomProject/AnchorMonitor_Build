@@ -24,24 +24,28 @@ export default class extends Component {
                 <div className="Hero">
                     <div className="HeroGroup">
                         <h1>Pending {name} Anchors</h1>
-                        <table className="FullTable">
-                            <thead>
-                                <tr>
-                                    <th className="headerheight">HEIGHT</th>
-                                    <th className="headertime">START TIME</th>
-                                    <th className="headerkeymr">KEYMR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.map((anchor) => (
-                                    <tr key={`${anchor._id}`} className="anchor-row">
-                                        <td key={`${anchor._id}--height`} style={{ paddingLeft: "1.5rem !important" }} className="bodyheight">{anchor.height}</td>
-                                        <td key={`${anchor._id}--started_at`} className="bodystarted">{anchor.started_at}</td>
-                                        <td key={`${anchor._id}--keymr`} className="bodykeymr">{anchor.keymr}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        {typeof data === "string" ? (
+                            <div>{data}</div>
+                        ) : (
+                                <table className="FullTable">
+                                    <thead>
+                                        <tr>
+                                            <th className="headerheight">HEIGHT</th>
+                                            <th className="headertime">START TIME</th>
+                                            <th className="headerkeymr">KEYMR</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.map((anchor) => (
+                                            <tr key={`${anchor._id}`} className="anchor-row">
+                                                <td key={`${anchor._id}--height`} style={{ paddingLeft: "1.5rem !important" }} className="bodyheight">{anchor.height}</td>
+                                                <td key={`${anchor._id}--started_at`} className="bodystarted">{anchor.started_at}</td>
+                                                <td key={`${anchor._id}--keymr`} className="bodykeymr">{anchor.keymr}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                     </div>
                 </div>
 
