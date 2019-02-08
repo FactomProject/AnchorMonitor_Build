@@ -27,13 +27,19 @@ export default class extends Component {
                         <table className="FullTable">
                             <thead>
                                 <tr>
-                                    <th>HEIGHT</th>
-                                    <th>START TIME</th>
-                                    <th>KEYMR</th>
+                                    <th className="headerheight">HEIGHT</th>
+                                    <th className="headertime">START TIME</th>
+                                    <th className="headerkeymr">KEYMR</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr></tr>
+                                {data.map((anchor) => (
+                                    <tr key={`${anchor._id}`} className="anchor-row">
+                                        <td key={`${anchor._id}--height`} style={{ paddingLeft: "1.5rem !important" }} className="bodyheight">{anchor.height}</td>
+                                        <td key={`${anchor._id}--started_at`} className="bodystarted">{anchor.started_at}</td>
+                                        <td key={`${anchor._id}--keymr`} className="bodykeymr">{anchor.keymr}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
@@ -101,6 +107,51 @@ export default class extends Component {
                         background: white;
                         color: black;
                     }
+                    table {
+                        display: block;
+                        overflow-x: auto;
+                        border-collapse: collapse;
+                        text-align: left;
+                        white-space: nowrap;
+                    }
+                    table  tr {
+                        display: grid;
+                        grid-template-columns: 8rem 1fr 1fr;
+                        grid-template-areas: " colheight coltime colkeymr";
+                    }
+                    table thead th {
+                        background: #E8E8E8;
+                        font-size: 60%;
+                        padding: 1.5rem;
+                        font-weight: 600;
+                    }
+                    .headerheight .bodyheight {
+                        grid-area:  colheight;
+                        padding-right: 0;
+                    }
+                    .headertime .bodystarted {
+                        grid-area: coltime;
+                    }
+                    .headerkeymr {
+                        grid-area: colkeymr;
+                    }
+                    thead th:not(:first-child) {
+                        padding-left: 0 !important;
+                    }
+                    tbody td {
+                        font-size: 60%;
+                        padding: 1.5rem;
+                    }
+                    tbody td:not(:first-child) {
+                        padding-left: 0 !important;
+                    }
+                    .bodykeymr {
+                        display: block;
+                        font-family: 'Roboto Mono', monospace;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
                     @media (max-width: 640px) {
                         .HeroGroup {
                             padding: 100px 20px;
