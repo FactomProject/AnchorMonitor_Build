@@ -40,19 +40,19 @@ setupWebSocket = () => {
     console.log('Connection Error');
   };
 
-client.onopen = function () {
-  console.log('WebSocket Client Connected');
+  client.onopen = function () {
+    console.log('WebSocket Client Connected');
 
-  function sendNumber() {
-    if (client.readyState === client.OPEN) {
-      client.send(`{"op":"addr_sub", "addr":"1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF"}`);
+    function sendNumber() {
+      if (client.readyState === client.OPEN) {
+        client.send(`{"op":"addr_sub", "addr":"1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF"}`);
+      }
     }
-  }
-  setInterval(() => {
-    sendNumber();
-  }, 300000)
+    setInterval(() => {
+      sendNumber();
+    }, 300000)
 
-  sendNumber();
+    sendNumber();
   };
 
   client.onclose = function () {
@@ -66,7 +66,7 @@ client.onopen = function () {
       if (typeof e.data === 'string') {
         let obj = JSON.parse(e.data);
         let outScript = obj.x.out[1].script;
-        let keyMR = outScript.substring(outScript.length-64, outScript.length);
+        let keyMR = outScript.substring(outScript.length - 64, outScript.length);
         let height = parseInt(outScript.substring(12, 20), 16);
         let transHash = obj.x.hash;
         let time = obj.x.time;
@@ -80,9 +80,9 @@ client.onopen = function () {
         })
         SaveData.save().then(() => {
           console.log("saved BlockchainDOTcom")
-          FactomBlocks.findOneAndUpdate({keymr: keyMR}, {btc_hash: transHash},(err, data) => {
+          FactomBlocks.findOneAndUpdate({ keymr: keyMR }, { btc_hash: transHash }, (err, data) => {
             err ? console.log("Err in find", err) :
-            console.log("FOUND IT: ", data)
+              console.log("FOUND IT: ", data)
             // data.btc_hash = transHash;
             // data.save();
           })
@@ -206,10 +206,10 @@ CheckSavedBitcoinMessages = () => {
     let sorted = data.sort((a, b) => {
       return a.height - b.height
     })
-    for (let i = 0; i <= sorted.length-1; i++) {
-      FactomBlocks.findOneAndUpdate({keymr: sorted[i].keymr}, {btc_hash: sorted[i].btc_trans_hash},(err, data) => {
+    for (let i = 0; i <= sorted.length - 1; i++) {
+      FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
         err ? console.log("Err in find", err) :
-        console.log("FOUND IT: ", data)
+          console.log("FOUND IT: ", data)
       })
     }
   })
@@ -225,9 +225,9 @@ CheckSavedBitcoinMessages5minutes = () => {
       return b.height - a.height
     })
     for (let i = 0; i <= 10; i++) {
-      FactomBlocks.findOneAndUpdate({keymr: sorted[i].keymr}, {btc_hash: sorted[i].btc_trans_hash},(err, data) => {
+      FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
         err ? console.log("Err in find", err) :
-        console.log("FOUND IT: ", data)
+          console.log("FOUND IT: ", data)
       })
     }
   })
