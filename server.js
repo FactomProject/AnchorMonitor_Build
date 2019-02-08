@@ -224,11 +224,20 @@ CheckSavedBitcoinMessages5minutes = () => {
     let sorted = data.sort((a, b) => {
       return b.height - a.height
     })
-    for (let i = 0; i <= 10; i++) {
-      FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
-        err ? console.log("Err in find", err) :
-          console.log("FOUND IT: ", data)
-      })
+    if (sorted.length < 10) {
+      for (let i = 0; i <= sorted.length; i++) {
+        FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
+          err ? console.log("Err in find", err) :
+            console.log("FOUND IT: ", data)
+        })
+      }
+    } else {
+      for (let i = 0; i <= 10; i++) {
+        FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
+          err ? console.log("Err in find", err) :
+            console.log("FOUND IT: ", data)
+        })
+      }
     }
   })
 }
