@@ -41,7 +41,7 @@ export default class extends Component {
                                             <tr key={`${anchor._id}`} className="anchor-row">
                                                 <td key={`${anchor._id}--height`} style={{ paddingLeft: "1.5rem !important" }} className="bodyheight">{anchor.height}</td>
                                                 <td key={`${anchor._id}--started_at`} className="bodystarted">{moment(anchor.started_at).format('YYYY-MM-DD HH:mm')}</td>
-                                                <td key={`${anchor._id}--keymr`} className="bodykeymr">{anchor.keymr}</td>
+                                                <td key={`${anchor._id}--keymr`} className="bodykeymr"><a href={`http://explorer.factom.com/dblocks/${anchor.keymr}`}>{anchor.keymr}</a></td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -54,18 +54,21 @@ export default class extends Component {
 
                 <style jsx="true">{`
                     .Hero {
-                        background-size: cover;
-                        background-position: center;
+                        max-width: 1400px;
+                        justify-self: center;
+                        width: -webkit-fill-available;
                         grid-area: table;
                         border-radius: 0.4rem;
                         z-index: 1;
                         background: #FFF;
                         -webkit-box-shadow: 0 0 8px 0 rgba(0,0,0, 0.12);
                         box-shadow: 0 0 8px 0 rgba(0,0,0, 0.9);
+                        animation: HeroAnimation  3s ;
+                        animation-fill-mode: forwards; 
+                        animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
                     }
                     .HeroGroup {
                         margin: 0 auto;
-                        // max-width: 500px;
                         padding: 3rem 3.5rem;
                         display: grid;
                             grid-template-columns: 1fr;
@@ -81,14 +84,10 @@ export default class extends Component {
                         margin: 0;
                         grid-area: tableheader;
                         justify-self: start;
-                        color: #000;;
+                        color: #000;
                         font-size: 2rem;
                         font-weight: 700;
                         line-height: 1.2;
-                        opacity: 0;
-                        animation: HeroAnimation  3s ;
-                        animation-fill-mode: forwards; 
-                        animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
                     }
                     .Hero p {
                         color: rgba(255, 255, 255, 0.8);
@@ -96,21 +95,6 @@ export default class extends Component {
                         line-height: 1.5;
                         animation: HeroAnimation 3s 0.2s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
                         opacity: 0;
-                    }
-                    .Hero a {
-                        font-size: 17px;
-                        font-weight: 600;
-                        color: white;
-                        text-transform: uppercase;
-                        background: rgba(0, 0, 0, 0.7);
-                        padding: 9px 20px;
-                        border: 1px solid rgba(255, 255, 255, 0.25);
-                        border-radius: 20px;
-                        transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-                    }
-                    .Hero a:hover {
-                        background: white;
-                        color: black;
                     }
                     table {
                         display: block;
@@ -125,12 +109,12 @@ export default class extends Component {
                     }
                     table  tr {
                         display: grid;
-                        grid-template-columns: minmax(100px, 140px) minmax(100px, 200px) minmax(200px, 1fr);
+                        grid-template-columns: minmax(100px,170px) minmax(100px,250px) minmax(100px,1fr);
                         grid-template-areas: " colheight coltime colkeymr";
                     }
                     table thead th {
                         background: #E8E8E8;
-                        font-size: 60%;
+                        font-size: 70%;
                         padding: 1.5rem;
                         font-weight: 600;
                     }
@@ -148,8 +132,9 @@ export default class extends Component {
                         padding-left: 0 !important;
                     }
                     tbody td {
-                        font-size: 60%;
+                        font-size: 70%;
                         padding: 1.5rem;
+                        letter-spacing: 1.2px;
                         color: #4A4A4A;
                         border-bottom: 1px solid #E9E9E9;
                     }
@@ -162,7 +147,17 @@ export default class extends Component {
                         overflow: hidden;
                         text-overflow: ellipsis;
                     }
-
+                    .bodykeymr a {
+                        text-transform: none;
+                        background: none;
+                        color: #388FC9;
+                    }
+                    
+                    @media (min-width: 1235px) {
+                        tbody td:first-child .headerheight{
+                            padding-left: 2rem;
+                        }
+                    }
                     @media (max-width: 640px) {
                         .HeroGroup {
                             padding: 30px 20px;
@@ -178,6 +173,18 @@ export default class extends Component {
                             font-size: 24px;
                         }
                     }
+                    @media (max-width: 450px) {
+                    
+                        .Hero h1 {
+                            font-size: 25px;
+                            font-weight: 400;
+                        }
+                    
+                        .Hero p {
+                            font-size: 24px;
+                        }
+                    }
+                    
                     @keyframes HeroAnimation {
                         0% {
                             opacity: 0;

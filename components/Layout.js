@@ -11,24 +11,26 @@ export default ({ children, title = 'This is the default title' }) => (
         </Head>
         <header className="Header">
             <nav className="HeaderGroup">
-                <Link href={`/BTC`}>
-                    <a className="FactomIcon">
-                        <h1><FactomIcon />
-                            <span style={{ display: "none" }}>Factom Anchor Monitor</span>
-                        </h1>
-                    </a>
-                </Link>
-                <div className="BTCorETH">
+                <div className="InsideHeaderGroup">
                     <Link href={`/BTC`}>
-                        <a>
-                            BTC
+                        <a className="FactomIcon">
+                            <h1><FactomIcon />
+                                <span style={{ display: "none" }}>Factom Anchor Monitor</span>
+                            </h1>
                         </a>
                     </Link>
-                    <Link href={`/ETH`}>
-                        <a>
-                            ETH
-                        </a>
-                    </Link>
+                    <div className="BTCorETH">
+                        <Link href={`/BTC`}>
+                            <a>
+                                BTC
+                            </a>
+                        </Link>
+                        <Link href={`/ETH`}>
+                            <a>
+                                ETH
+                            </a>
+                        </Link>
+                    </div>
                 </div>
             </nav>
         </header>
@@ -48,15 +50,15 @@ export default ({ children, title = 'This is the default title' }) => (
             }
         `}</style>
 
-        <style jsx>{`
+        <style jsx="true">{`
             .PageLayout {
                 display: grid;
-                grid-template-columns: .1fr 1fr 1fr 1fr .1fr;
+                grid-template-columns: 3rem 7fr 3rem;
                 grid-template-rows:  7rem minmax(100px, 980px) 1fr;
                 grid-template-areas: 
-                ". mainheader mainheader mainheader ."
-                ". table table table ."
-                "footer footer footer footer footer";
+                "mainheader mainheader mainheader"
+                ". table  ."
+                "footer footer footer";
                 grid-row-gap: 15px;
             }
             .Header {
@@ -65,21 +67,28 @@ export default ({ children, title = 'This is the default title' }) => (
                 height: 13rem;
                 width: 100%;
                 padding: 0;
-                // z-index: -1;
                 background: #142C3C;
                 transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
             }
             .HeaderGroup {
-                grid-area: table;
                 margin: 0 auto;
                 display: grid;
-                grid-template-columns: .1fr 1fr 1fr 1fr .1fr;
-
+                width: auto;
+                grid-template-columns: 3rem 1fr 3rem;
                 grid-template-areas:
-                '. header .  menu .';
+                '. headerinside  .';
                 grid-gap: 10px;
                 padding: 10px;
-                padding-top:30px;
+            }
+            .InsideHeaderGroup {
+                grid-area: headerinside;
+                display: grid;
+                max-width: 1400px;
+                grid-template-columns:  1fr 6fr 1fr;
+
+                grid-template-areas:
+                'header .  menu';
+                padding: 10px;
                 align-items: center;
                 justify-items: center;
                 justify-self: center;
@@ -93,6 +102,9 @@ export default ({ children, title = 'This is the default title' }) => (
                 width: 13rem;
                 grid-area: header;
                 justify-self: start;
+                animation: HeroAnimation  3s ;
+                animation-fill-mode: forwards; 
+                animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
             }
             .FactomIcon h1 {
                 margin: 9px 0 0 0;
@@ -129,6 +141,17 @@ export default ({ children, title = 'This is the default title' }) => (
                 }
                 .FactomIcon {
                     width: 10rem;
+                }
+            }
+            @keyframes HeroAnimation {
+                0% {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+            
+                100% {
+                    opacity: 1;
+                    transform: translateY(0px);
                 }
             }
 
