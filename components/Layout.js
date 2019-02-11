@@ -35,8 +35,6 @@ export default ({ children, title = 'This is the default title' }) => (
 
         {children}
 
-        <footer>{'I`m here to stay'}</footer>
-
         <style jsx global>{`
             body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -53,7 +51,7 @@ export default ({ children, title = 'This is the default title' }) => (
         <style jsx>{`
             .PageLayout {
                 display: grid;
-                grid-template-columns: .3fr 1fr 1fr 1fr .3fr;
+                grid-template-columns: .1fr 1fr 1fr 1fr .1fr;
                 grid-template-rows:  7rem minmax(100px, 980px) 1fr;
                 grid-template-areas: 
                 ". mainheader mainheader mainheader ."
@@ -75,7 +73,7 @@ export default ({ children, title = 'This is the default title' }) => (
                 grid-area: table;
                 margin: 0 auto;
                 display: grid;
-                grid-template-columns: .3fr 1fr 1fr 1fr .3fr;
+                grid-template-columns: .1fr 1fr 1fr 1fr .1fr;
 
                 grid-template-areas:
                 '. header .  menu .';
@@ -119,7 +117,19 @@ export default ({ children, title = 'This is the default title' }) => (
                 font-size: 1.4rem;
                 font-weight: 600;
                 color: #FFF;
+                justify-content: center;
                 // opacity: 0.5;
+            }
+            @media (max-width: 640px) {
+                .HeaderGroup {
+                    padding: 10px;
+                }
+                .PageLayout {
+                    grid-template-rows:  4.5rem minmax(100px, 980px) 1fr;
+                }
+                .FactomIcon {
+                    width: 10rem;
+                }
             }
 
         `}</style>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Layout from '../components/Layout'
+import moment from 'moment'
 
 export default class extends Component {
     constructor(props) {
@@ -39,7 +40,7 @@ export default class extends Component {
                                         {data.map((anchor) => (
                                             <tr key={`${anchor._id}`} className="anchor-row">
                                                 <td key={`${anchor._id}--height`} style={{ paddingLeft: "1.5rem !important" }} className="bodyheight">{anchor.height}</td>
-                                                <td key={`${anchor._id}--started_at`} className="bodystarted">{anchor.started_at}</td>
+                                                <td key={`${anchor._id}--started_at`} className="bodystarted">{moment(anchor.started_at).format('YYYY-MM-DD HH:mm')}</td>
                                                 <td key={`${anchor._id}--keymr`} className="bodykeymr">{anchor.keymr}</td>
                                             </tr>
                                         ))}
@@ -124,7 +125,7 @@ export default class extends Component {
                     }
                     table  tr {
                         display: grid;
-                        grid-template-columns: minmax(100px, 200px) minmax(100px, 300px) minmax(100px, 1fr);
+                        grid-template-columns: minmax(100px, 140px) minmax(100px, 200px) minmax(200px, 1fr);
                         grid-template-areas: " colheight coltime colkeymr";
                     }
                     table thead th {
@@ -164,11 +165,13 @@ export default class extends Component {
 
                     @media (max-width: 640px) {
                         .HeroGroup {
-                            padding: 100px 20px;
+                            padding: 30px 20px;
+                            grid-template-rows: 3.5rem minmax(300px,780px) 2fr;
                         }
                     
                         .Hero h1 {
-                            font-size: 40px;
+                            font-size: 35px;
+                            font-weight: 400;
                         }
                     
                         .Hero p {
