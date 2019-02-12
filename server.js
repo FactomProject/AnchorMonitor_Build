@@ -31,7 +31,7 @@ app.use('/graphql', express_graphql({
   rootValue: root,
   graphiql: true
 }));
-let vep = app.listen(5001, () => console.log(`Express GraphQL Server Now Running On ${vep.address().port}`));
+let vep = app.listen(6001, () => console.log(`Express GraphQL Server Now Running On ${vep.address().port}`));
 
 // Socket to listen to Factoms address on Blockchain.com
 setupWebSocket = () => {
@@ -148,7 +148,7 @@ FindSmallest = () => {
 }
 
 //setInterval(() => {
-  //FindSmallest()
+//FindSmallest()
 //}, 300000)
 
 CallHarm = () => {
@@ -225,11 +225,11 @@ CheckSavedBitcoinMessages5minutes = () => {
   console.log("Called CheckSavedBitcoinMessages5minutes");
   BlockchainDOTcom.find({}, (err, data) => {
     let sorted = data.sort((a, b) => {
-      return b.height - a.height
+      return a.height - b.height
     })
+    console.log("[0]", sorted[0], "[sorted.length - 1]", sorted[sorted.length - 1])
     if (sorted.length < 10) {
-      for (let i = 0; i <= sorted.length-1; i++) {
-	console.log("sorted[i] in < 10 for loop: ", sorted[i])
+      for (let i = 0; i <= sorted.length - 1; i++) {
         FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
           err ? console.log("Err in find", err) :
             console.log("FOUND IT: ", data)
@@ -241,6 +241,19 @@ CheckSavedBitcoinMessages5minutes = () => {
           err ? console.log("Err in find", err) :
             console.log("FOUND IT: ", data)
         })
+        if (i === 10) {
+          // axios({
+          //   method: "GET",
+          //   url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${sorted[i].keymr}`,
+          //   headers: {
+          //     "Content-Type": "application/json",
+          //     "app_id": "c6bd4cff",
+          //     "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+          //   }
+          // }).then(res => {
+          //   console.log(res.data)
+          // }).catch(err => console.log("dblocks keymr ", err))
+        }
       }
     }
   })

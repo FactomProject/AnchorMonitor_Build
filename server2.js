@@ -31,11 +31,14 @@ app.prepare().then(() => {
       let sorted = response.sort((a, b) => {
         return b.height - a.height
       });
-      console.log("res", res)
+      // console.log("res", res)
       let no_btc_hash = [];
+      let lastAnchored = 0;
       for (let i = 0; i <= sorted.length - 1; i++) {
         if (sorted[i].btc_hash === undefined) {
           no_btc_hash.push(sorted[i])
+        } else {
+          
         }
       }
       // res.send(no_btc_hash)

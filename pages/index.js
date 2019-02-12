@@ -1,30 +1,48 @@
 import React, { Component } from 'react'
 import Layout from '../components/Layout'
 import moment from 'moment'
+import axios from 'axios'
 
-export default class extends Component {
+export default class Main extends Component {
     constructor(props) {
         super(props)
 
         this.state = {
             name: props.name === 'BTC' ? 'Bitcoin' : props.name === 'ETH' ? 'Ethereum' : null
         }
-    }
-    static getInitialProps({ query: { name, data } }) {
-        console.log("name: ", name)
-        return { name: name, data: data }
+
+        // this.getInitialProps = this.getInitialProps
+
+        setInterval(() => {
+
+            Main.getInitialProps
+        }, 2000)
     }
 
+    static getInitialProps({ query: { name, data, lastAnchored } }) {
+        console.log("name: ", name, new Date())
+        return { name: name, data: data, lastAnchored: lastAnchored }
+    }
+
+    componentDidMount() {
+        axios({ method: "get", url: `https://blockchain.info/q/addressbalance/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF` })
+            .then(res => { console.log(res.data), this.setState({ addrBalance: res.data }) })
+            .catch(err => console.log("Address Balance Error ", err))
+    }
+
+
     render() {
-        let { name } = this.state;
+        let { name, addrBalance } = this.state;
         let { data } = this.props;
-        console.log("client data", data)
 
         return (
             <Layout title='Bitcoin Anchors'>
                 <div className="Hero">
                     <div className="HeroGroup">
-                        <h1>Pending {name} Anchors</h1>
+                        <div className="HeroGroupHeader">
+                            <h1>Pending {name} Anchors</h1>
+                            <small>Last Anchor:  | Address Balance: {addrBalance} | Count: {data.length} | </small>
+                        </div>
                         {typeof data === "string" ? (
                             <div>{data}</div>
                         ) : (
@@ -80,9 +98,18 @@ export default class extends Component {
                             grid-row-gap: 15px;
                         text-align: center;
                     }
+                    .HeroGroupHeader {
+                        grid-area: tableheader;
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                    .HeroGroupHeader small {
+                        justify-self: end;
+                        align-self: end;
+                        font-weight: 600;
+                    }
                     .Hero h1 {
                         margin: 0;
-                        grid-area: tableheader;
                         justify-self: start;
                         color: #000;
                         font-size: 2rem;
