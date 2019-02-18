@@ -81,10 +81,7 @@ setupWebSocket = () => {
         SaveData.save().then(() => {
           console.log("saved BlockchainDOTcom")
           FactomBlocks.findOneAndUpdate({ keymr: keyMR }, { btc_hash: transHash }, (err, data) => {
-            err ? console.log("Err in find", err) :
-              console.log("FOUND IT: ", data)
-            // data.btc_hash = transHash;
-            // data.save();
+            if (err) console.log("Err in find", err)
           })
         }).catch(err => console.log("BlockchainDOTcom Save Error: ", err));
       }
@@ -138,19 +135,6 @@ factomBitcoinTX = () => {
 // factomBitcoinTX()
 // }, 600000)
 
-FindSmallest = () => {
-  FactomBlocks.find({}, (err, data) => {
-    let sorted = data.sort((a, b) => {
-      return a.height - b.height
-    })
-    // SingleBlock(sorted[0].height);
-  })
-}
-
-//setInterval(() => {
-//FindSmallest()
-//}, 300000)
-
 CallHarm = () => {
   console.log("Called CallHarm")
   axios({
@@ -178,29 +162,46 @@ setInterval(() => {
   CallHarm()
 }, 300000)
 
-SingleBlock = (height) => {
-  console.log("Height in SingleBlock ", height)
-  axios({
-    method: "GET",
-    url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${height - 1}`,
-    headers: {
-      "Content-Type": "application/json",
-      "app_id": "c6bd4cff",
-      "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
-    }
-  }).then(res => {
-    let SaveBlock = new FactomBlocks({
-      height: res.data.data.height,
-      keymr: res.data.data.keymr,
-      started_at: res.data.data.started_at
+SingleBlock = () => {
+  FactomBlocks.find({ btc_hash: { $exists: false } }, (err, data) => {
+    err ? console.log("Err in find", err) : console.log("without btc_hash: ", data)
+    data.forEach((block) => {
+      axios({
+        method: "GET",
+        url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${block.keymr}`,
+        headers: {
+          "Content-Type": "application/json",
+          "app_id": "c6bd4cff",
+          "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+        }
+      }).then(res => {
+        axios({
+          method: "GET",
+          url: `https://blockchain.info/rawtx/${res.data.data.btc_transaction}`
+        }).then(blockres => {
+          let outScript = blockres.data.out[1].script;
+          let keyMR = outScript.substring(outScript.length - 64, outScript.length);
+          let height = parseInt(outScript.substring(12, 20), 16);
+          let transHash = blockres.data.hash;
+          let time = blockres.data.time;
+
+          let SaveData = new BlockchainDOTcom({
+            script: outScript,
+            keymr: keyMR,
+            height: height,
+            btc_trans_hash: transHash,
+            time: time,
+          })
+          SaveData.save().then(() => {
+            console.log("saved BlockchainDOTcom")
+            FactomBlocks.findOneAndUpdate({ keymr: keyMR }, { btc_hash: transHash }, (err, data) => {
+            })
+          }).catch(err => console.log("BlockchainDOTcom Save Error: ", err));
+        }).catch(err => console.log("Blockchain.com Error: ", err.response))
+      }).catch(err => console.log("SingleBlock Error: ", err))
     })
-    SaveBlock.save().then(() => {
-
-    }).catch(() => null);
-  }).catch(err => console.log("SingleBlock ERROR", err.data))
+  })
 }
-
-// SingleBlock();
 
 CheckSavedBitcoinMessages = () => {
   console.log("Called CheckSavedBitcoinMessages")
@@ -219,41 +220,25 @@ CheckSavedBitcoinMessages = () => {
 
 setInterval(() => {
   CheckSavedBitcoinMessages()
+  SingleBlock();
 }, 3600000)
 
 CheckSavedBitcoinMessages5minutes = () => {
-  console.log("Called CheckSavedBitcoinMessages5minutes");
   BlockchainDOTcom.find({}, (err, data) => {
     let sorted = data.sort((a, b) => {
       return a.height - b.height
     })
-    console.log("[0]", sorted[0], "[sorted.length - 1]", sorted[sorted.length - 1])
     if (sorted.length < 10) {
       for (let i = 0; i <= sorted.length - 1; i++) {
         FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
-          err ? console.log("Err in find", err) :
-            console.log("FOUND IT: ", data)
+          if (err) console.log("Err in find", err)
         })
       }
     } else {
       for (let i = 0; i <= 10; i++) {
         FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
-          err ? console.log("Err in find", err) :
-            console.log("FOUND IT: ", data)
+          if (err) console.log("Err in find", err)
         })
-        if (i === 10) {
-          // axios({
-          //   method: "GET",
-          //   url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${sorted[i].keymr}`,
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //     "app_id": "c6bd4cff",
-          //     "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
-          //   }
-          // }).then(res => {
-          //   console.log(res.data)
-          // }).catch(err => console.log("dblocks keymr ", err))
-        }
       }
     }
   })
@@ -262,3 +247,5 @@ CheckSavedBitcoinMessages5minutes = () => {
 setInterval(() => {
   CheckSavedBitcoinMessages5minutes()
 }, 300010)
+
+
