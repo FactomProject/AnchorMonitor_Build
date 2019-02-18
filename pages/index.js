@@ -34,18 +34,18 @@ export default class Main extends Component {
     render() {
         let { name, addrBalance } = this.state;
         let { data } = this.props;
+        console.log(data)
 
         return (
             <Layout title='Bitcoin Anchors'>
                 <div className="Hero">
-                    <div className="HeroGroup">
-                        <div className="HeroGroupHeader">
-                            <h1>Pending {name} Anchors</h1>
-                            <small>Last Anchor:  | Address Balance: {addrBalance} | Count: {data.length} | </small>
-                        </div>
-                        {typeof data === "string" ? (
-                            <div>{data}</div>
-                        ) : (
+                    {Array.isArray(data) ? (
+                        data.length !== 0 ? (
+                            <div className="HeroGroup">
+                                <div className="HeroGroupHeader">
+                                    <h1>Pending {name} Anchors</h1>
+                                    <small>Last Anchor:  | Address Balance: {addrBalance} | Count: {data.length} | </small>
+                                </div>
                                 <table className="FullTable">
                                     <thead>
                                         <tr>
@@ -64,8 +64,29 @@ export default class Main extends Component {
                                         ))}
                                     </tbody>
                                 </table>
-                            )}
-                    </div>
+                            </div>
+                        ) : (
+                                <div className="HeroGroup">
+                                    <div className="HeroGroupHeader">
+                                        <h1>Pending {name} Anchors</h1>
+                                        <small>Last Anchor:  | Address Balance: {addrBalance} | Count: {data.length} | </small>
+                                    </div>
+                                    <div className="NoAnchors"><h1>No pending Anchors!</h1></div>
+                                </div>
+                            )
+
+                    ) : (
+
+                            <div className="HeroGroup">
+                                <div className="HeroGroupHeader">
+                                    <h1>Pending {name} Anchors</h1>
+                                </div>
+                                <div>{data}</div>
+                            </div>
+                        )}
+                    {/* {typeof data === "string" ? (
+                    ) : (
+                        )} */}
                 </div>
 
 
@@ -178,6 +199,9 @@ export default class Main extends Component {
                         text-transform: none;
                         background: none;
                         color: #388FC9;
+                    }
+                    .NoAnchors {
+
                     }
                     
                     @media (min-width: 1235px) {
