@@ -21,8 +21,25 @@ app.prepare().then(() => {
   const server = express()
 
   server.get('/', (req, res) => {
-    console.log(req.query)
-    return app.render(req, res, '/', { name: "BTC" })
+    FactomBlocks.find({}, (err, data) => {
+    }).then((response) => {
+      let sorted = response.sort((a, b) => {
+        return b.height - a.height
+      });
+      // console.log("res", res)
+      let no_btc_hash = [];
+      let lastAnchored = 0;
+      for (let i = 0; i <= sorted.length - 1; i++) {
+        if (sorted[i].btc_conf === undefined) {
+          no_btc_hash.push(sorted[i])
+        } else {
+
+        }
+      }
+      // res.send(no_btc_hash)
+
+      return app.render(req, res, '/', { name: "BTC", data: no_btc_hash })
+    });
   })
 
   server.get('/BTC', (req, res) => {
@@ -35,10 +52,10 @@ app.prepare().then(() => {
       let no_btc_hash = [];
       let lastAnchored = 0;
       for (let i = 0; i <= sorted.length - 1; i++) {
-        if (sorted[i].btc_hash === undefined) {
+        if (sorted[i].btc_conf === undefined) {
           no_btc_hash.push(sorted[i])
         } else {
-          
+
         }
       }
       // res.send(no_btc_hash)

@@ -218,9 +218,9 @@ CheckSavedBitcoinMessages = () => {
   })
 }
 
+
 setInterval(() => {
   CheckSavedBitcoinMessages()
-  SingleBlock();
 }, 3600000)
 
 CheckSavedBitcoinMessages5minutes = () => {
@@ -244,8 +244,29 @@ CheckSavedBitcoinMessages5minutes = () => {
   })
 }
 
+
+FindingConfirmations = () => {
+  SingleBlock();
+  axios({
+    method: "GET",
+    url: `https://api.blockcypher.com/v1/btc/main/addrs/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF?limit=500`
+  }).then(res => {
+    for (let keys in res.data) {
+      console.log("key: ", keys)
+    }
+    console.log(res.data.txrefs.length)
+    res.data.txrefs.forEach((trans) => {
+      if (trans.confirmations > 0) {
+        FactomBlocks.findOneAndUpdate({ btc_hash: trans.tx_hash }, { btc_conf: true }, (err, data) => {
+          if (err) console.log("Err in find", err)
+        })
+      }
+    })
+  }).catch(err => console.log("err", err))
+}
+
 setInterval(() => {
+  FindingConfirmations()
   CheckSavedBitcoinMessages5minutes()
 }, 300010)
-
 

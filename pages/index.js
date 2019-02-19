@@ -122,7 +122,7 @@ export default class Main extends Component {
                     .HeroGroupHeader {
                         grid-area: tableheader;
                         display: grid;
-                        grid-template-columns: repeat(2, 1fr);
+                        grid-template-rows: repeat(2, 1fr);
                     }
                     .HeroGroupHeader small {
                         justify-self: end;
