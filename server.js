@@ -79,11 +79,10 @@ setupWebSocket = () => {
           time: time,
         })
         SaveData.save().then(() => {
-          console.log("saved BlockchainDOTcom")
           FactomBlocks.findOneAndUpdate({ keymr: keyMR }, { btc_hash: transHash }, (err, data) => {
             if (err) console.log("Err in find", err)
           })
-        }).catch(err => console.log("BlockchainDOTcom Save Error: ", err));
+        }).catch(err => err.code === 11000 ? null : console.log("BlockchainDOTcom Save Error: ", err));
       }
     }, 1000)
   };

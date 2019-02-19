@@ -19,22 +19,13 @@ export default class Main extends Component {
         }, 2000)
     }
 
-    static getInitialProps({ query: { name, data, lastAnchored } }) {
-        console.log("name: ", name, new Date())
-        return { name: name, data: data, lastAnchored: lastAnchored }
+    static getInitialProps({ query: { name, data, lastAnchored, balance } }) {
+        return { name: name, data: data, lastAnchored: lastAnchored, balance: balance }
     }
-
-    componentDidMount() {
-        axios({ method: "get", url: `https://blockchain.info/q/addressbalance/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF` })
-            .then(res => { console.log(res.data), this.setState({ addrBalance: res.data }) })
-            .catch(err => console.log("Address Balance Error ", err))
-    }
-
 
     render() {
-        let { name, addrBalance } = this.state;
-        let { data } = this.props;
-        console.log(data)
+        let { name } = this.state;
+        let { data, balance } = this.props;
 
         return (
             <Layout title='Bitcoin Anchors'>
@@ -44,7 +35,7 @@ export default class Main extends Component {
                             <div className="HeroGroup">
                                 <div className="HeroGroupHeader">
                                     <h1>Pending {name} Anchors</h1>
-                                    <small>Last Anchor:  | Address Balance: {addrBalance} | Count: {data.length} | </small>
+                                    <small>Last Anchor:  | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
                                 </div>
                                 <table className="FullTable">
                                     <thead>
@@ -52,6 +43,7 @@ export default class Main extends Component {
                                             <th className="headerheight">HEIGHT</th>
                                             <th className="headertime">START TIME</th>
                                             <th className="headerkeymr">KEYMR</th>
+                                            <th className="headerbtchash">BTC HASH</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -59,7 +51,12 @@ export default class Main extends Component {
                                             <tr key={`${anchor._id}`} className="anchor-row">
                                                 <td key={`${anchor._id}--height`} style={{ paddingLeft: "1.5rem !important" }} className="bodyheight">{anchor.height}</td>
                                                 <td key={`${anchor._id}--started_at`} className="bodystarted">{moment(anchor.started_at).format('YYYY-MM-DD HH:mm')}</td>
-                                                <td key={`${anchor._id}--keymr`} className="bodykeymr"><a href={`http://explorer.factom.com/dblocks/${anchor.keymr}`}>{anchor.keymr}</a></td>
+                                                <td key={`${anchor._id}--keymr`} className="bodykeymr"><a href={`http://explorer.factom.com/dblocks/${anchor.keymr}`} target="_blank">{anchor.keymr}</a></td>
+                                                <td key={`${anchor._id}--btchash`} className="bodybtchash">
+                                                    {anchor.btc_hash === "" ? console.log("Nada") : (
+                                                        <a href={`https://www.blockchain.com/btc/tx/${anchor.btc_hash}`} target="_blank">{anchor.btc_hash}</a>
+                                                    )}
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -69,14 +66,12 @@ export default class Main extends Component {
                                 <div className="HeroGroup">
                                     <div className="HeroGroupHeader">
                                         <h1>Pending {name} Anchors</h1>
-                                        <small>Last Anchor:  | Address Balance: {addrBalance} | Count: {data.length} | </small>
+                                        <small>Last Anchor:  | Address Balance: {balance / 0.00000001} | Count: {data.length} | </small>
                                     </div>
                                     <div className="NoAnchors"><h1>No pending Anchors!</h1></div>
                                 </div>
                             )
-
                     ) : (
-
                             <div className="HeroGroup">
                                 <div className="HeroGroupHeader">
                                     <h1>Pending {name} Anchors</h1>
@@ -84,9 +79,6 @@ export default class Main extends Component {
                                 <div>{data}</div>
                             </div>
                         )}
-                    {/* {typeof data === "string" ? (
-                    ) : (
-                        )} */}
                 </div>
 
 
@@ -157,8 +149,8 @@ export default class Main extends Component {
                     }
                     table  tr {
                         display: grid;
-                        grid-template-columns: minmax(100px,170px) minmax(100px,250px) minmax(100px,1fr);
-                        grid-template-areas: " colheight coltime colkeymr";
+                        grid-template-columns: minmax(100px,170px) minmax(100px,200px) minmax(100px,1fr) minmax(100px,1fr);
+                        grid-template-areas: " colheight coltime colkeymr colbtchash ";
                     }
                     table thead th {
                         background: #E8E8E8;
@@ -175,6 +167,10 @@ export default class Main extends Component {
                     }
                     .headerkeymr {
                         grid-area: colkeymr;
+                    }
+                    .headerbtchash {
+                        grid-area: colbtchash;
+                        
                     }
                     thead th:not(:first-child) {
                         padding-left: 0 !important;
@@ -196,6 +192,17 @@ export default class Main extends Component {
                         text-overflow: ellipsis;
                     }
                     .bodykeymr a {
+                        text-transform: none;
+                        background: none;
+                        color: #388FC9;
+                    }
+                    .bodybtchash {
+                        display: block;
+                        font-family: 'Roboto Mono', monospace;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                    .bodybtchash a {
                         text-transform: none;
                         background: none;
                         color: #388FC9;
