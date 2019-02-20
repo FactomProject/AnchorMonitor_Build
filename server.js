@@ -210,8 +210,7 @@ CheckSavedBitcoinMessages = () => {
     })
     for (let i = 0; i <= sorted.length - 1; i++) {
       FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
-        err ? console.log("Err in find", err) :
-          console.log("FOUND IT: ", data)
+        if (err) console.log("Err in find", err)
       })
     }
   })
