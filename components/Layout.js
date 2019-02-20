@@ -54,7 +54,7 @@ export default ({ children, title = 'This is the default title' }) => (
             .PageLayout {
                 display: grid;
                 grid-template-columns: 3rem 7fr 3rem;
-                grid-template-rows:  7rem minmax(100px, 980px) 1fr;
+                grid-template-rows:  7rem minmax(100px, 950px) 1fr;
                 grid-template-areas: 
                 "mainheader mainheader mainheader"
                 ". table  ."

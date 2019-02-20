@@ -263,7 +263,7 @@ FindingConfirmations = () => {
 // Function to find missing BTC transaction Hash if missing. 
 FindingBTCHASH = () => {
   FactomBlocks.find({ btc_hash: { $exists: false } }, (err, data) => {
-    err ? console.log("Err in find", err) : console.log("without btc_hash: ", data)
+    if (err) console.log("Err in find FindingBTCHASH", err)
     data.forEach((block) => {
       axios({
         method: "GET",

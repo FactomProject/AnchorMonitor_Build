@@ -99,7 +99,7 @@ export default class Main extends Component {
                     }
                     .HeroGroup {
                         margin: 0 auto;
-                        padding: 3rem 3.5rem;
+                        padding: 2rem 2.5rem;
                         display: grid;
                             grid-template-columns: 1fr;
                             grid-template-rows:  5rem minmax(300px, 780px) 2fr;
