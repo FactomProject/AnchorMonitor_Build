@@ -11,21 +11,18 @@ export default class Main extends Component {
             name: props.name === 'BTC' ? 'Bitcoin' : props.name === 'ETH' ? 'Ethereum' : null
         }
 
-        // this.getInitialProps = this.getInitialProps
-
         setInterval(() => {
-
             Main.getInitialProps
         }, 2000)
     }
 
-    static getInitialProps({ query: { name, data, lastAnchored, balance } }) {
-        return { name: name, data: data, lastAnchored: lastAnchored, balance: balance }
+    static getInitialProps({ query: { name, data, lastConf, balance } }) {
+        return { name: name, data: data, lastConf: lastConf, balance: balance }
     }
 
     render() {
         let { name } = this.state;
-        let { data, balance } = this.props;
+        let { data, lastConf, balance } = this.props;
 
         return (
             <Layout title='Bitcoin Anchors'>
@@ -35,7 +32,7 @@ export default class Main extends Component {
                             <div className="HeroGroup">
                                 <div className="HeroGroupHeader">
                                     <h1>Pending {name} Anchors</h1>
-                                    <small>Last Anchor:  | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
+                                    <small>Last Anchor: {lastConf} | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
                                 </div>
                                 <table className="FullTable">
                                     <thead>
@@ -66,7 +63,7 @@ export default class Main extends Component {
                                 <div className="HeroGroup">
                                     <div className="HeroGroupHeader">
                                         <h1>Pending {name} Anchors</h1>
-                                        <small>Last Anchor:  | Address Balance: {balance / 0.00000001} | Count: {data.length} | </small>
+                                        <small>Last Anchor: {lastConf} | Address Balance: {balance / 0.00000001} | Count: {data.length} | </small>
                                     </div>
                                     <div className="NoAnchors"><h1>No pending Anchors!</h1></div>
                                 </div>
@@ -259,7 +256,3 @@ export default class Main extends Component {
         )
     }
 }
-
-// const Stylez = () => (
-
-// )

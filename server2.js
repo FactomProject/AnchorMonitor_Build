@@ -63,7 +63,11 @@ app.prepare().then(() => {
         if (sorted[i].btc_conf === undefined) {
           no_btc_hash.push(sorted[i])
         } else {
-
+          if (sorted[i].btc_conf !== undefined && sorted[i].btc_hash !== undefined) {
+            if (sorted[i].height > lastAnchored) {
+              lastAnchored = sorted[i].height
+            }
+          }
         }
       }
 
@@ -75,7 +79,7 @@ app.prepare().then(() => {
 
       let balance = Promise.resolve(stuff);
       balance.then((val) => {
-        return app.render(req, res, '/', { name: "BTC", data: no_btc_hash, balance: val })
+        return app.render(req, res, '/', { name: "BTC", data: no_btc_hash, lastConf: lastAnchored, balance: val })
       })
 
     });
