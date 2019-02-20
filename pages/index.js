@@ -32,7 +32,20 @@ export default class Main extends Component {
                             <div className="HeroGroup">
                                 <div className="HeroGroupHeader">
                                     <h1>Pending {name} Anchors</h1>
-                                    <small>Last Anchor: {lastConf} | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
+                                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2,auto)" }}>
+                                        <small style={{ justifySelf: "start" }}>Turn off notifications for:
+                                        <span className="custom-dropdown">
+                                                <select>
+                                                    <option>Sherlock Holmes</option>
+                                                    <option>The Great Gatsby</option>
+                                                    <option>V for Vendetta</option>
+                                                    <option>The Wolf of Wallstreet</option>
+                                                    <option>Quantum of Solace</option>
+                                                </select>
+                                            </span>
+                                        </small>
+                                        <small>Last Anchor: {lastConf} | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
+                                    </div>
                                 </div>
                                 <table className="FullTable">
                                     <thead>
@@ -65,7 +78,20 @@ export default class Main extends Component {
                                 <div className="HeroGroup">
                                     <div className="HeroGroupHeader">
                                         <h1>Pending {name} Anchors</h1>
-                                        <small>Last Anchor: {lastConf} | Address Balance: {balance / 0.00000001} | Count: {data.length} | </small>
+                                        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,auto)" }}>
+                                            <small style={{ justifySelf: "start" }}>Turn off notifications for:
+                                        <span className="custom-dropdown">
+                                                    <select>
+                                                        <option>Sherlock Holmes</option>
+                                                        <option>The Great Gatsby</option>
+                                                        <option>V for Vendetta</option>
+                                                        <option>The Wolf of Wallstreet</option>
+                                                        <option>Quantum of Solace</option>
+                                                    </select>
+                                                </span>
+                                            </small>
+                                            <small>Last Anchor: {lastConf} | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
+                                        </div>
                                     </div>
                                     <div className="NoAnchors"><h1>No pending Anchors!</h1></div>
                                 </div>
@@ -206,19 +232,84 @@ export default class Main extends Component {
                         background: none;
                         color: #388FC9;
                     }
-                    .NoAnchors {
-
+                    .custom-dropdown {
+                        position: relative;
+                        display: inline-block;
+                        vertical-align: middle;
+                        margin: 10px; /* demo only */
                     }
-                    
+
+                    .custom-dropdown select {
+                        background-color: #2c3e50;
+                        color: #fff;
+                        font-size: inherit;
+                        padding: .5em;
+                        padding-right: 2.5em;	
+                        border: 0;
+                        margin: 0;
+                        border-radius: 3px;
+                        text-indent: 0.01px;
+                        text-overflow: '';
+                        -webkit-appearance: button; /* hide default arrow in chrome OSX */
+                    }
+                    .custom-dropdown::before,
+                    .custom-dropdown::after {
+                        content: "";
+                        position: absolute;
+                        pointer-events: none;
+                    }
+
+                    .custom-dropdown::after { 
+                        content: "\u25bc";
+                        height: 1em;
+                        font-size: .625em;
+                        line-height: 1;
+                        right: 1.2em;
+                        top: 50%;
+                        margin-top: -.5em;
+                    }
+
+                    .custom-dropdown::before { 
+                        width: 2em;
+                        right: 0;
+                        top: 0;
+                        bottom: 0;
+                        border-radius: 0 3px 3px 0;
+                    }
+
+                    .custom-dropdown select[disabled] {
+                        color: rgba(0,0,0,.3);
+                    }
+
+                    .custom-dropdown select[disabled]::after {
+                        color: rgba(0,0,0,.1);
+                    }
+
+                    .custom-dropdown::before {
+                        background-color: rgba(0,0,0,.15);
+                    }
+
+                    .custom-dropdown::after {
+                        color: rgba(0,0,0,.4);
+                    }                    
                     @media (min-width: 1235px) {
                         tbody td:first-child .headerheight{
                             padding-left: 2rem;
                         }
                     }
+                    @media (max-width: 700px) {
+                        table  tr {
+                            grid-template-columns: minmax(100px,170px) minmax(100px,1fr) minmax(100px,1fr);
+                            grid-template-areas: " colheight colkeymr colbtchash "
+                        }
+                        .headertime, .bodystarted {
+                            display: none;
+                        }
+                    }
                     @media (max-width: 640px) {
                         .HeroGroup {
                             padding: 30px 20px;
-                            grid-template-rows: 3.5rem minmax(300px,780px) 2fr;
+                            grid-template-rows: 6.5rem minmax(300px,780px) 2fr;
                         }
                     
                         .Hero h1 {
@@ -239,6 +330,10 @@ export default class Main extends Component {
                     
                         .Hero p {
                             font-size: 24px;
+                        }
+
+                        .headertime {
+                            display: none;
                         }
                     }
                     
