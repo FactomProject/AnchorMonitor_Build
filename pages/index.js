@@ -50,9 +50,11 @@ export default class Main extends Component {
                                                 <td key={`${anchor._id}--started_at`} className="bodystarted">{moment(anchor.started_at).format('YYYY-MM-DD HH:mm')}</td>
                                                 <td key={`${anchor._id}--keymr`} className="bodykeymr"><a href={`http://explorer.factom.com/dblocks/${anchor.keymr}`} target="_blank">{anchor.keymr}</a></td>
                                                 <td key={`${anchor._id}--btchash`} className="bodybtchash">
-                                                    {anchor.btc_hash === "" ? console.log("Nada") : (
-                                                        <a href={`https://www.blockchain.com/btc/tx/${anchor.btc_hash}`} target="_blank">{anchor.btc_hash}</a>
-                                                    )}
+                                                    {anchor.btc_hash === undefined ? (
+                                                        <a style={{ color: "#4A4A4A" }}>{`BTC has not recieved transaction yet.`}</a>
+                                                    ) : (
+                                                            <a href={`https://www.blockchain.com/btc/tx/${anchor.btc_hash}`} target="_blank">{anchor.btc_hash}</a>
+                                                        )}
                                                 </td>
                                             </tr>
                                         ))}
