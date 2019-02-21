@@ -91,7 +91,7 @@ export default class Main extends Component {
                                         <small style={{ gridArea: "otherHeaderInfo" }}>Last Anchor: {lastConf} | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
                                     </div>
                                 </div>
-                                <table className="FullTable">
+                                <table className="FullTable" id="style-7">
                                     <thead>
                                         <tr>
                                             <th className="headerheight">HEIGHT</th>
@@ -221,6 +221,25 @@ export default class Main extends Component {
                         text-align: left;
                         white-space: nowrap;
                     }
+
+                    #style-7::-webkit-scrollbar-track {
+                        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+                        background-color: #F5F5F5;                                                                     
+                    }
+                    #style-7::-webkit-scrollbar {
+                        width: 10px;
+                        background-color: #F5F5F5;
+                    }
+                    #style-7::-webkit-scrollbar-thumb {
+                        background-image: -webkit-gradient(linear,
+									   40% 0%,
+									   75% 84%,
+									   from(#142C3C),
+									   to(#142C3C),
+									   color-stop(.7,#142c3cb8));
+                        /* background-color: #142C3C; */
+                    }
+
                     table thead,
                     table tbody {
                         display: grid;
@@ -233,8 +252,12 @@ export default class Main extends Component {
                     table thead th {
                         background: #E8E8E8;
                         font-size: 70%;
-                        padding: 1.5rem;
+                        padding: 1.2rem;
                         font-weight: 600;
+                    }
+                    table thead th:first-child {
+                        border-top-left-radius: 0.4rem;
+                        border-bottom-left-radius: 0.4rem;
                     }
                     .headerheight .bodyheight {
                         grid-area:  colheight;
