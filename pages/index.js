@@ -8,8 +8,12 @@ export default class Main extends Component {
         super(props)
 
         this.state = {
-            name: props.name === 'BTC' ? 'Bitcoin' : props.name === 'ETH' ? 'Ethereum' : null
+            name: props.name === 'BTC' ? 'Bitcoin' : props.name === 'ETH' ? 'Ethereum' : null,
+            showMenu: false,
         }
+
+        this.showMenu = this.showMenu.bind(this);
+        this.closeMenu = this.closeMenu.bind(this);
 
         setInterval(() => {
             Main.getInitialProps
@@ -20,9 +24,28 @@ export default class Main extends Component {
         return { name: name, data: data, lastConf: lastConf, balance: balance }
     }
 
+    showMenu = (event) => {
+        event.preventDefault();
+        this.setState({ showMenu: true }, () => {
+            document.addEventListener('click', this.closeMenu);
+        });
+    }
+
+    closeMenu = () => {
+        this.setState({ showMenu: false }, () => {
+            document.removeEventListener('click', this.closeMenu);
+        });
+    }
+
+    menuSelect = (event) => {
+        console.log(event.target)
+    }
+
     render() {
-        let { name } = this.state;
+        let { name, showMenu } = this.state;
         let { data, lastConf, balance } = this.props;
+        let holder = "30 Minutes"
+        console.log(showMenu)
 
         return (
             <Layout title='Bitcoin Anchors'>
@@ -32,19 +55,40 @@ export default class Main extends Component {
                             <div className="HeroGroup">
                                 <div className="HeroGroupHeader">
                                     <h1>Pending {name} Anchors</h1>
-                                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2,auto)" }}>
-                                        <small style={{ justifySelf: "start" }}>Turn off notifications for:
-                                        <span className="custom-dropdown">
-                                                <select>
-                                                    <option>Sherlock Holmes</option>
-                                                    <option>The Great Gatsby</option>
-                                                    <option>V for Vendetta</option>
-                                                    <option>The Wolf of Wallstreet</option>
-                                                    <option>Quantum of Solace</option>
-                                                </select>
-                                            </span>
-                                        </small>
-                                        <small>Last Anchor: {lastConf} | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
+                                    <div className="tableHeaderContent">
+                                        <div className="select" style={{ gridArea: "offNoti", display: "grid", gridTemplateColumns: "210px 130px" }}>
+                                            <small style={{ justifySelf: "start" }}>Turn off notifications for: </small>
+                                            <span className="placeholder" onClick={this.showMenu}>{holder}</span>
+                                            {showMenu ? (
+                                                <ul>
+                                                    <li onClick={this.menuSelect}>30 Minutes</li>
+                                                    <li onClick={this.menuSelect}>1 hour</li>
+                                                    <li onClick={this.menuSelect}>3 hours</li>
+                                                    <li onClick={this.menuSelect}>6 hours</li>
+                                                    <li onClick={this.menuSelect}>9 hours</li>
+                                                    <li onClick={this.menuSelect}>12 hours</li>
+                                                    <li onClick={this.menuSelect}>1 Day</li>
+                                                </ul>
+                                            ) : (null)}
+                                            <input type="hidden" name="changeme" />
+                                        </div>
+                                        <div className="select" style={{ gridArea: "pendingNoti", display: "grid", gridTemplateColumns: "210px 130px" }}>
+                                            <small style={{ justifySelf: "start" }}>Turn off notifications for: </small>
+                                            <span className="placeholder" onClick={this.showMenu}>{holder}</span>
+                                            {showMenu ? (
+                                                <ul>
+                                                    <li onClick={this.menuSelect}>30 Minutes</li>
+                                                    <li onClick={this.menuSelect}>1 hour</li>
+                                                    <li onClick={this.menuSelect}>3 hours</li>
+                                                    <li onClick={this.menuSelect}>6 hours</li>
+                                                    <li onClick={this.menuSelect}>9 hours</li>
+                                                    <li onClick={this.menuSelect}>12 hours</li>
+                                                    <li onClick={this.menuSelect}>1 Day</li>
+                                                </ul>
+                                            ) : (null)}
+                                            <input type="hidden" name="changeme" />
+                                        </div>
+                                        <small style={{ gridArea: "otherHeaderInfo" }}>Last Anchor: {lastConf} | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
                                     </div>
                                 </div>
                                 <table className="FullTable">
@@ -128,7 +172,7 @@ export default class Main extends Component {
                         padding: 2rem 2.5rem;
                         display: grid;
                             grid-template-columns: 1fr;
-                            grid-template-rows:  5rem minmax(300px, 780px) 2fr;
+                            grid-template-rows:  9rem minmax(300px,720px) 2fr;
                             grid-template-areas: 
                             "tableheader"
                             "tablebody"
@@ -145,6 +189,15 @@ export default class Main extends Component {
                         justify-self: end;
                         align-self: end;
                         font-weight: 600;
+                    }
+                    .tableHeaderContent {
+                        display: grid;
+                        grid-template-columns: auto 1fr;
+                            grid-template-rows:  auto 1fr;
+                            grid-template-areas: 
+                            "offNoti ."
+                            "pendingNoti otherHeaderInfo";
+                        grid-column-gap: 10px;
                     }
                     .Hero h1 {
                         margin: 0;
@@ -232,7 +285,7 @@ export default class Main extends Component {
                         background: none;
                         color: #388FC9;
                     }
-                    .custom-dropdown {
+                    {/* .custom-dropdown {
                         position: relative;
                         display: inline-block;
                         vertical-align: middle;
@@ -291,10 +344,98 @@ export default class Main extends Component {
 
                     .custom-dropdown::after {
                         color: rgba(0,0,0,.4);
-                    }                    
+                    }                     */}
+
+
+                    .select {
+                        position: relative;
+                        display: block;
+                        width: 100%;
+                        text-align: left;
+                        user-select: none;
+                        -webkit-touch-callout: none;
+                    }
+                    .placeholder {
+                        position: relative;
+                        display: block;
+                        top: 6px;
+                        background-color: #142C3C;
+                        z-index: 1;
+                        padding: .5em;
+                        border-radius: 0.4rem;
+                        cursor: pointer;
+                        font-size: 70%;
+                        color: #cccccc;                        
+                        height: 20px;
+                        align-self: end;
+                    }
+                    .placeholder:hover {
+                        background: darken(#142C3C,2%);
+                    }
+                    .placeholder:after {
+                        position: absolute;
+                        margin-left: 2em;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        font-family: 'FontAwesome';
+                        content: '\u25bc';
+                        z-index: 10;
+                        font-size: 70%;
+                    }
+                    {/* .is-open{
+                        .placeholder:after{
+                            content: '\f077';
+                        }
+                    } */}
+
+                    ul {
+                        position: absolute;
+                        overflow: hidden;
+                        overflow-y: auto;
+                        width: 35%;
+                        background: #fff;
+                        border-radius: 2px;
+                        top: 100%;
+                        left: 65.5%;
+                        list-style: none;
+                        margin: 5px 0 0 0;
+                        padding: 0;
+                        z-index: 100;
+                        box-shadow: 0 0 8px 0 rgba(0,0,0,0.9);
+                    }
+                    li {
+                        display: block;
+                        text-align: left;
+                        padding: 0.8em 1em 0.8em 1em;
+                        color: #999;
+                        cursor: pointer;
+                        font-size: 70%;
+                    }
+                    li:hover {
+                        background: #4ebbf0;
+                        color: #fff;
+                    }
+
+
                     @media (min-width: 1235px) {
                         tbody td:first-child .headerheight{
                             padding-left: 2rem;
+                        }
+                    }
+                    @media (max-width: 795px) {
+                        .tableHeaderContent {
+                            display: grid;
+                            grid-template-columns: auto;
+                            grid-template-rows:  auto 1fr 25px;
+                            grid-template-areas: 
+                                "offNoti"
+                                "pendingNoti"
+                                "otherHeaderInfo";
+                            grid-column-gap: 10px;
+                            grid-row-gap: 10px;
+                        }
+                        .tableHeaderContent small {
+                            justify-self: start;
                         }
                     }
                     @media (max-width: 700px) {
@@ -306,10 +447,23 @@ export default class Main extends Component {
                             display: none;
                         }
                     }
-                    @media (max-width: 640px) {
+                    @media (max-width: 686px) {
                         .HeroGroup {
                             padding: 30px 20px;
-                            grid-template-rows: 6.5rem minmax(300px,780px) 2fr;
+                            grid-template-rows: 10rem minmax(300px,720px) 2fr;
+                        }
+                    }
+                    @media (max-width: 644px) {
+                        .tableHeaderContent {
+                            display: grid;
+                            grid-template-columns: auto;
+                            grid-template-rows:  auto 1fr 45px;
+                            grid-template-areas: 
+                                "offNoti"
+                                "pendingNoti"
+                                "otherHeaderInfo";
+                            grid-column-gap: 10px;
+                            grid-row-gap: 10px;
                         }
                     
                         .Hero h1 {
@@ -321,7 +475,7 @@ export default class Main extends Component {
                             font-size: 24px;
                         }
                     }
-                    @media (max-width: 450px) {
+                    @media (max-width: 506px) {
                     
                         .Hero h1 {
                             font-size: 25px;

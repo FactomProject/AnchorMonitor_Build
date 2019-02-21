@@ -98,7 +98,6 @@ export default ({ children, title = 'This is the default title' }) => (
                 font-weight: 700;
             }
             .FactomIcon {
-                margin-left: 1rem;
                 width: 13rem;
                 grid-area: header;
                 justify-self: start;
