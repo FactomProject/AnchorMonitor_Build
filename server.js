@@ -7,6 +7,8 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const FactomBlocks = require('./models/FactomBlocksSchema');
 const BlockchainDOTcom = require('./models/BlockchainDOTcomSchema');
+const PendingNotifications = require('./models/PendingNotifications');
+const NotificationsOff = require('./models/NotificationsOff');
 
 mongoose.connect(process.env.DATABASE, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
@@ -90,45 +92,73 @@ setupWebSocket = () => {
 
 setupWebSocket();
 
-factomBitcoinTX = () => {
-  axios({
-    method: "get",
-    url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
+slackNotifications = () => {
+  NotificationsOff.find({}, null, { sort: { time: -1 } }, (err, data) => {
+    if (err) console.log("Err in find", err);
+    else {
+      PendingNotifications.find({}, null, { sort: { time: -1 } }, (err, pend) => {
+        console.log("data[0]: ", data[0])
+        console.log("pend: ", pend)
+        if (data[0].notificationtime === "30 minutes") {
+          console.log("current Date: ", new Date())
+          console.log("new Date(new Date(data[0].time).getTime() + 30 * 60000): ", new Date(new Date(data[0].time).getTime() + 30 * 60000))
+          console.log("in 2nd bigger than 1st? : ", new Date(new Date(data[0].time).getTime() + 30 * 60000) > new Date())
+          console.log("")
+          console.log("new Date(pend[0].time + (pend[0].notificationtime * 10) * 60000): ", new Date(new Date(pend[0].time).getTime() + (pend[0].notificationtime * 10)))
+          console.log("in ^^ bigger than current? : ", new Date(new Date(pend[0].time).getTime() + (pend[0].notificationtime * 10) > new Date()))
+          if (new Date(new Date(data[0].time).getTime() + 30 * 60000) > new Date() && new Date(new Date(pend[0].time).getTime() + (pend[0].notificationtime * 10) * 60000)) {
+            sendIt()
+          }
+        } else {
+          console.log("current Date: ", new Date())
+          console.log("new Date(data[0].time + 30 * 60000): ", new Date(data[0].time + 30 * 60000))
+          console.log("in 2nd bigger than 1st? : ", new Date(data[0].time + 30 * 60000) > new Date())
+          console.log("")
+          console.log("new Date(pend[0].time + (pend[0].notificationtime * 10) * 60000): ", new Date(pend[0].time + (pend[0].notificationtime * 10) * 60000))
+          console.log("in ^^ bigger than current? : ", new Date(pend[0].time + (pend[0].notificationtime * 10) * 60000))
+
+          if (new Date(data[0].time + 30 * 60000) > new Date() && new Date(pend[0].time + (pend[0].notificationtime * 10) * 60000) > new Date()) {
+            sendIt()
+          }
+        }
+      })
+    }
   })
-    .then(response => {
-      console.log(response.data.n_tx)
-      // axios({
-      //   method: "post",
-      //   url:
-      //     "https://hooks.slack.com/services/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",
-      //   headers: { "Content-type": "application/json" },
-      //   data: {
-      //     text: "",
-      //     attachments: [
-      //       {
-      //         fields: [
-      //           {
-      //             title: `Trans Count ${response.data.n_tx}%!!!`,
-      //             short: true
-      //           }
-      //         ],
-      //         color: "#FFB233",
-      //         text: `Last Trans Info: ${
-      //           response.data.txs[0]
-      //         } `
-      //       }
-      //     ]
-      //   }
-      // })
-      //   .then(res => {
-      //     console.log("done")
-      //   })
-      //   .catch(err => {
-      //     console.log("Or THIS??", err);
-      //   });
-    })
-    .catch(err => console.log(err));
+  function sendIt() {
+    console.log("sNed it called!")
+    // axios({
+    //   method: "post",
+    //   url:
+    //     "https://hooks.slack.com/services/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",
+    //   headers: { "Content-type": "application/json" },
+    //   data: {
+    //     text: "",
+    //     attachments: [
+    //       {
+    //         fields: [
+    //           {
+    //             title: `Trans Count ${response.data.n_tx}%!!!`,
+    //             short: true
+    //           }
+    //         ],
+    //         color: "#FFB233",
+    //         text: `Last Trans Info: ${
+    //           response.data.txs[0]
+    //         } `
+    //       }
+    //     ]
+    //   }
+    // })
+    //   .then(res => {
+    //     console.log("done")
+    //   })
+    //   .catch(err => {
+    //     console.log("Or THIS??", err);
+    //   });
+  }
 }
+
+slackNotifications()
 
 // Function to call Harmony to find latest Factom blocks.
 CallHarm = () => {

@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node server2.js",
+    "dev": "node routes.js",
     "build": "next build",
-    "start": "NODE_ENV=production node server2.js"
+    "start": "NODE_ENV=production node routes.js"
   },
   "author": "",
   "license": "ISC",
