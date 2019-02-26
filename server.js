@@ -9,6 +9,7 @@ const FactomBlocks = require('./models/FactomBlocksSchema');
 const BlockchainDOTcom = require('./models/BlockchainDOTcomSchema');
 const PendingNotifications = require('./models/PendingNotifications');
 const NotificationsOff = require('./models/NotificationsOff');
+const SentToSlack = require('./models/SentToSlack');
 
 mongoose.connect(process.env.DATABASE, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
@@ -92,70 +93,101 @@ setupWebSocket = () => {
 
 setupWebSocket();
 
+GetLastSlackNotification = () => {
+  return SentToSlack.find({}, null, { sort: { notification_time: -1 } })
+}
+
 slackNotifications = () => {
   NotificationsOff.find({}, null, { sort: { time: -1 } }, (err, data) => {
     if (err) console.log("Err in find", err);
     else {
-      PendingNotifications.find({}, null, { sort: { time: -1 } }, (err, pend) => {
-        console.log("data[0]: ", data[0])
-        console.log("pend: ", pend)
+      PendingNotifications.find({}, null, { sort: { time: -1 } }, async (err, pend) => {
+        console.log("CURRENT TIME: ", new Date());
         if (data[0].notificationtime === "30 minutes") {
-          let calledTimePlusthirty = new Date(new Date(data[0].time).getTime() + 30 * 60000);
-          let calledTimePlusNotiTime = new Date(new Date(pend[0].time).getTime() + (pend[0].notificationtime * 10) * 60000)
+          let offPlusthirty = new Date(new Date(data[0].time).getTime() + 30 * 60000);
+          let pendPlusNotiTime = new Date(new Date(pend[0].time).getTime() + parseInt(pend[0].notificationtime) * 600000)
+          let slackNotification = await Promise.resolve(GetLastSlackNotification())
+          let slackNotificationLastTime = slackNotification[0].notification_time;
+          let slackNotificationLastTime_with30min = new Date(new Date(slackNotificationLastTime).getTime() + 30 * 60000);
 
-          if (calledTimePlusthirty < new Date() && calledTimePlusNotiTime < new Date()) {
-            sendIt("line 110")
+          if (offPlusthirty < new Date() && pendPlusNotiTime < new Date() && slackNotificationLastTime_with30min < new Date()) {
+            let no_btc_hash = [];
+            FactomBlocks.find({}, null, { sort: { height: -1 } }, (err, data) => {
+              for (let i = 0; i <= data.length - 1; i++) {
+                if (data[i].btc_conf === undefined) {
+                  no_btc_hash.push(data[i])
+                }
+              }
+            }).then((res) => {
+              sendIt("line 110", no_btc_hash)
+            }).catch(err => console.log("ERR 108: ", err))
           }
         } else {
-          console.log("current Date: ", new Date())
-          console.log("new Date(data[0].time + 30 * 60000): ", new Date(data[0].time + 30 * 60000))
-          console.log("in 2nd bigger than 1st? : ", new Date(data[0].time + 30 * 60000) > new Date())
-          console.log("")
-          console.log("new Date(pend[0].time + (pend[0].notificationtime * 10) * 60000): ", new Date(pend[0].time + (pend[0].notificationtime * 10) * 60000))
-          console.log("in ^^ bigger than current? : ", new Date(pend[0].time + (pend[0].notificationtime * 10) * 60000))
+          let offPlusHours = new Date(new Date(data[0].time).getTime() + (parseInt(pend[0]) * 3600000));
+          let pendPlusNotiTime = new Date(new Date(pend[0].time).getTime() + (pend[0].notificationtime * 10) * 60000)
+          let slackNotification = await Promise.resolve(GetLastSlackNotification())
+          let slackNotificationLastTime = slackNotification[0].notification_time;
+          let slackNotificationLastTime_withhours = new Date(new Date(slackNotificationLastTime).getTime() + (parseInt(pend[0]) * 3600000));
 
-          if (new Date(data[0].time + 30 * 60000) > new Date() && new Date(pend[0].time + (pend[0].notificationtime * 10) * 60000) > new Date()) {
-            sendIt("line 121")
+          if (offPlusHours < new Date() && pendPlusNotiTime < new Date() && slackNotificationLastTime_withhours < new Date()) {
+            let no_btc_hash = [];
+            FactomBlocks.find({}, null, { sort: { height: -1 } }, (err, data) => {
+              for (let i = 0; i <= data.length - 1; i++) {
+                if (data[i].btc_conf === undefined) {
+                  no_btc_hash.push(data[i])
+                }
+              }
+            }).then((res) => {
+              sendIt("line 110", no_btc_hash)
+            }).catch(err => console.log("ERR 108: ", err))
           }
         }
       })
     }
   })
-  function sendIt(ish) {
-    console.log("sNed it called!", ish)
-    axios({
-      method: "post",
-      url:
-        "https://hooks.slack.com/services/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",
-      headers: { "Content-type": "application/json" },
-      data: {
-        text: "",
-        attachments: [
-          {
-            fields: [
-              {
-                title: ``,
-                short: true
-              }
-            ],
-            color: "#FFB233",
-            text: `Last Trans Info: ${
-              response.data.txs[0]
-              } `
-          }
-        ]
-      }
-    })
-      .then(res => {
-        console.log("done")
+  function sendIt(whereFrom, pending) {
+    console.log("sNed it called!", whereFrom);
+    console.log("pending: ", pending)
+    if (pending.length > 0) {
+      axios({
+        method: "post",
+        url:
+          "https://hooks.slack.com/services/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",
+        headers: { "Content-type": "application/json" },
+        data: {
+          text: "",
+          attachments: [
+            {
+              color: "#FFB233",
+              text: `<http://localhost:3000/BTC> for more information.`,
+              fields: [
+                {
+                  title: `${pending.length} Pending Bitcoin Anchors`,
+                  short: true
+                }
+              ],
+            }
+          ]
+        }
       })
-      .catch(err => {
-        console.log("Or THIS??", err);
-      });
+        .then(res => {
+          console.log("done");
+          let SaveData = new SentToSlack({
+            notification_time: new Date(),
+            highest_height: pending[0].height,
+          })
+          SaveData.save().catch(err => console.log("SentToSlack Save Error: ", err));
+        })
+        .catch(err => {
+          console.log("Or THIS??", err);
+        });
+    }
   }
 }
 
-slackNotifications()
+setInterval(() => {
+  slackNotifications()
+}, 9000)
 
 // Function to call Harmony to find latest Factom blocks.
 CallHarm = () => {
