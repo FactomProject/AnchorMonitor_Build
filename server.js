@@ -97,58 +97,91 @@ GetLastSlackNotification = () => {
   return SentToSlack.find({}, null, { sort: { notification_time: -1 } })
 }
 
+GetPendingList = () => {
+  let no_btc_hash = [];
+  return FactomBlocks.find({ btc_conf: { $exists: false } }, null, { sort: { height: -1 } }, (err, data) => {
+    // for (let i = 0; i <= data.length - 1; i++) {
+    //   if (data[i].btc_conf === undefined) {
+    //     no_btc_hash.push(data[i])
+    //   }
+    // }
+  })
+  // .then(() => {
+  //   setTimeout(() => {
+  //     console.log("no_btc_hash: ", no_btc_hash);
+  //     return no_btc_hash;
+  //   }, 100)
+  // })
+}
+
 slackNotifications = () => {
-  NotificationsOff.find({}, null, { sort: { time: -1 } }, (err, data) => {
+  NotificationsOff.find({}, null, { sort: { time: -1 } }, (err, off) => {
     if (err) console.log("Err in find", err);
     else {
       PendingNotifications.find({}, null, { sort: { time: -1 } }, async (err, pend) => {
         console.log("CURRENT TIME: ", new Date());
-        if (data[0].notificationtime === "30 minutes") {
-          let offPlusthirty = new Date(new Date(data[0].time).getTime() + 30 * 60000);
-          let pendPlusNotiTime = new Date(new Date(pend[0].time).getTime() + parseInt(pend[0].notificationtime) * 600000)
-          let slackNotification = await Promise.resolve(GetLastSlackNotification())
+        if (off[0].notificationtime === "30 minutes") {
+          let slackNotification = await Promise.resolve(GetLastSlackNotification());
           let slackNotificationLastTime = slackNotification[0].notification_time;
-          let slackNotificationLastTime_with30min = new Date(new Date(slackNotificationLastTime).getTime() + 30 * 60000);
+          let offUntil = new Date(new Date(off[0].time).getTime() + (30 * 60000));
+          let pendingList = await Promise.resolve(GetPendingList());
+          let pendingCount = pendingList.length;
+          let highest_height = pendingList[0].height;
 
-          if (offPlusthirty < new Date() && pendPlusNotiTime < new Date() && slackNotificationLastTime_with30min < new Date()) {
-            let no_btc_hash = [];
-            FactomBlocks.find({}, null, { sort: { height: -1 } }, (err, data) => {
-              for (let i = 0; i <= data.length - 1; i++) {
-                if (data[i].btc_conf === undefined) {
-                  no_btc_hash.push(data[i])
-                }
+          if (offUntil < new Date()) {
+            console.log("Passed Off Timeout")
+            if (pendingCount >= pend[0].notificationtime && pendingCount > 0) {
+              console.log("Count more than User set Count")
+              if (pendingCount >= 10 && new Date(new Date(slackNotificationLastTime).getTime() + (30 * 60000)) < new Date()) {
+                console.log("Pending Count >= 10 AND its been over 30 minutes since Slack notification");
+                sendIt("line 168", pendingCount, highest_height)
+              } else if (pendingCount < 10 && new Date(new Date(slackNotificationLastTime).getTime() + (60 * 60000)) < new Date()) {
+                console.log("Pending Count < 10 AND its been over an hour since Slack notification");
+                sendIt("line 171", pendingCount, highest_height)
+              } else {
+                console.log(`NO!!!! last Slack: ${new Date(slackNotificationLastTime)} and pendingCount: ${pendingCount}`)
               }
-            }).then((res) => {
-              sendIt("line 110", no_btc_hash)
-            }).catch(err => console.log("ERR 108: ", err))
+            } else {
+              console.log(`Count: ${pendingCount} < User set count: ${pend[0].notificationtime}`)
+            }
+          } else {
+            console.log("User set Notification Off until: ", offUntil)
           }
         } else {
-          let offPlusHours = new Date(new Date(data[0].time).getTime() + (parseInt(pend[0]) * 3600000));
-          let pendPlusNotiTime = new Date(new Date(pend[0].time).getTime() + (pend[0].notificationtime * 10) * 60000)
-          let slackNotification = await Promise.resolve(GetLastSlackNotification())
+          let slackNotification = await Promise.resolve(GetLastSlackNotification());
           let slackNotificationLastTime = slackNotification[0].notification_time;
-          let slackNotificationLastTime_withhours = new Date(new Date(slackNotificationLastTime).getTime() + (parseInt(pend[0]) * 3600000));
+          let offUntil = new Date(new Date(off[0].time).getTime() + (parseInt(off[0].notificationtime) * 3600000));
+          let pendingList = await Promise.resolve(GetPendingList());
+          let pendingCount = pendingList.length;
+          let highest_height = pendingList[0].height;
 
-          if (offPlusHours < new Date() && pendPlusNotiTime < new Date() && slackNotificationLastTime_withhours < new Date()) {
-            let no_btc_hash = [];
-            FactomBlocks.find({}, null, { sort: { height: -1 } }, (err, data) => {
-              for (let i = 0; i <= data.length - 1; i++) {
-                if (data[i].btc_conf === undefined) {
-                  no_btc_hash.push(data[i])
-                }
+          if (offUntil < new Date()) {
+            console.log("Passed Off Timeout")
+            if (pendingCount >= pend[0].notificationtime && pendingCount > 0) {
+              console.log("Count more than User set Count")
+              if (pendingCount >= 10 && new Date(new Date(slackNotificationLastTime).getTime() + (30 * 60000)) < new Date()) {
+                console.log("Pending Count >= 10 AND its been over 30 minutes since Slack notification");
+                sendIt("line 168", pendingCount, highest_height)
+              } else if (pendingCount < 10 && new Date(new Date(slackNotificationLastTime).getTime() + (60 * 60000)) < new Date()) {
+                console.log("Pending Count < 10 AND its been over an hour since Slack notification");
+                sendIt("line 171", pendingCount, highest_height)
+              } else {
+                console.log(`NO!!!! last Slack: ${new Date(slackNotificationLastTime)} and pendingCount: ${pendingCount}`)
               }
-            }).then((res) => {
-              sendIt("line 110", no_btc_hash)
-            }).catch(err => console.log("ERR 108: ", err))
+            } else {
+              console.log(`Count: ${pendingCount} < User set count: ${pend[0].notificationtime}`)
+            }
+          } else {
+            console.log("User set Notification Off until: ", offUntil)
           }
         }
       })
     }
   })
-  function sendIt(whereFrom, pending) {
-    console.log("sNed it called!", whereFrom);
-    console.log("pending: ", pending)
-    if (pending.length > 0) {
+  function sendIt(whereFrom, pendingCount, highest_height) {
+    console.log("Send it called!", whereFrom);
+    console.log("pending: ", pendingCount)
+    if (pendingCount > 0) {
       axios({
         method: "post",
         url:
@@ -162,7 +195,7 @@ slackNotifications = () => {
               text: `<http://localhost:3000/BTC> for more information.`,
               fields: [
                 {
-                  title: `${pending.length} Pending Bitcoin Anchors`,
+                  title: `${pendingCount} Pending Bitcoin Anchors`,
                   short: true
                 }
               ],
@@ -174,7 +207,7 @@ slackNotifications = () => {
           console.log("done");
           let SaveData = new SentToSlack({
             notification_time: new Date(),
-            highest_height: pending[0].height,
+            highest_height: highest_height,
           })
           SaveData.save().catch(err => console.log("SentToSlack Save Error: ", err));
         })
@@ -187,7 +220,7 @@ slackNotifications = () => {
 
 setInterval(() => {
   slackNotifications()
-}, 9000)
+}, 13000)
 
 // Function to call Harmony to find latest Factom blocks.
 CallHarm = () => {

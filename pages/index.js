@@ -71,6 +71,7 @@ export default class Main extends Component {
         let { name, pendingNotiToggle, offNotiToggle } = this.state;
         let { data, lastConf, balance } = this.props;
         let holder = "30 Minutes"
+        let countHolder = "1 Block"
 
         return (
             <Layout title='Bitcoin Anchors'>
@@ -81,9 +82,9 @@ export default class Main extends Component {
                                 <div className="HeroGroupHeader">
                                     <h1>Pending {name} Anchors</h1>
                                     <div className="tableHeaderContent">
-                                        <div className="select" style={{ gridArea: "offNoti ", display: "grid", gridTemplateColumns: "230px 130px" }}>
+                                        <div className="select" style={{ gridArea: "offNoti ", display: "grid", gridTemplateColumns: "255px 130px" }}>
                                             <small style={{ justifySelf: "start" }}>Turn off notifications for: </small>
-                                            <span className="placeholder" onClick={this.showMenuOffNoti}>{holder}</span>
+                                            <span className="placeholder " onClick={this.showMenuOffNoti}>{holder}</span>
                                             {offNotiToggle ? (
                                                 <ul>
                                                     <li onClick={this.offNotiSelect} value="30">30 Minutes</li>
@@ -97,19 +98,19 @@ export default class Main extends Component {
                                             ) : (null)}
                                             <input type="hidden" name="changeme" />
                                         </div>
-                                        <div className="select" style={{ gridArea: "pendingNoti", display: "grid", gridTemplateColumns: "230px 130px" }}>
-                                            <small style={{ justifySelf: "start" }}># of blocks before notifying: </small>
-                                            <span className="placeholder" onClick={this.showMenuPendingNoti}>{holder}</span>
+                                        <div className="select" style={{ gridArea: "pendingNoti", display: "grid", gridTemplateColumns: "255px 130px" }}>
+                                            <small style={{ justifySelf: "start" }}>Pending count before notifying: </small>
+                                            <span className="placeholder small" onClick={this.showMenuPendingNoti}>{countHolder}</span>
                                             {pendingNotiToggle ? (
                                                 <ul>
-                                                    <li onClick={this.pendingNotiSelect} value="1">1 block</li>
-                                                    <li onClick={this.pendingNotiSelect} value="2">2 blocks</li>
-                                                    <li onClick={this.pendingNotiSelect} value="4">4 blocks</li>
-                                                    <li onClick={this.pendingNotiSelect} value="9">9 blocks</li>
-                                                    <li onClick={this.pendingNotiSelect} value="18">18 blocks</li>
-                                                    <li onClick={this.pendingNotiSelect} value="36">36 blocks</li>
-                                                    <li onClick={this.pendingNotiSelect} value="72">72 blocks</li>
-                                                    <li onClick={this.pendingNotiSelect} value="144">144 blocks</li>
+                                                    <li onClick={this.pendingNotiSelect} value="1">1 Block</li>
+                                                    <li onClick={this.pendingNotiSelect} value="2">2 Blocks</li>
+                                                    <li onClick={this.pendingNotiSelect} value="4">4 Blocks</li>
+                                                    <li onClick={this.pendingNotiSelect} value="9">9 Blocks</li>
+                                                    <li onClick={this.pendingNotiSelect} value="18">18 Blocks</li>
+                                                    <li onClick={this.pendingNotiSelect} value="36">36 Blocks</li>
+                                                    <li onClick={this.pendingNotiSelect} value="72">72 Blocks</li>
+                                                    <li onClick={this.pendingNotiSelect} value="144">144 Blocks</li>
                                                 </ul>
                                             ) : (null)}
                                             <input type="hidden" name="changeme" />
@@ -453,6 +454,16 @@ export default class Main extends Component {
                         z-index: 10;
                         font-size: 70%;
                     }
+                    .small:after {
+                        position: absolute;
+                        margin-left: 4.7em;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        font-family: 'FontAwesome';
+                        content: '\u25bc';
+                        z-index: 10;
+                        font-size: 70%;
+                    }
 
                     ul {
                         position: absolute;
@@ -488,7 +499,7 @@ export default class Main extends Component {
                             padding-left: 2rem;
                         }
                     }
-                    @media (max-width: 795px) {
+                    @media (max-width: 830px) {
                         .tableHeaderContent {
                             display: grid;
                             grid-template-columns: auto;
