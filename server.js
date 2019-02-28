@@ -94,7 +94,7 @@ setupWebSocket = () => {
 setupWebSocket();
 
 GetLastSlackNotification = () => {
-  return SentToSlack.find({}, null, { sort: { notification_time: 1 } })
+  return SentToSlack.find({}, null, { sort: { notification_time: -1 } })
 }
 
 GetPendingList = () => {
@@ -122,12 +122,10 @@ slackNotifications = () => {
         console.log("CURRENT TIME: ", new Date());
         if (off[0].notificationtime === "30 minutes") {
           let slackNotification = await Promise.resolve(GetLastSlackNotification());
-          console.log("SLACKNOTI: ", slackNotification)
           let slackNotificationLastTime = [];
           if (slackNotification.length > 0) {
             slackNotificationLastTime = slackNotification[0].notification_time;
           }
-          console.log("slackNotificationLastTime", slackNotificationLastTime)
 
           let offUntil = new Date(new Date(off[0].time).getTime() + (30 * 60000));
           let pendingList = await Promise.resolve(GetPendingList());
@@ -163,8 +161,10 @@ slackNotifications = () => {
           }
         } else {
           let slackNotification = await Promise.resolve(GetLastSlackNotification());
-          let slackNotificationLastTime = slackNotification[0].notification_time;
-          console.log("slackNotificationLastTime", slackNotificationLastTime)
+          let slackNotificationLastTime = [];
+          if (slackNotification.length > 0) {
+            slackNotificationLastTime = slackNotification[0].notification_time;
+          }
           let offUntil = new Date(new Date(off[0].time).getTime() + (parseInt(off[0].notificationtime) * 3600000));
           let pendingList = await Promise.resolve(GetPendingList());
           let pendingCount = 0;
