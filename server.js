@@ -125,8 +125,12 @@ slackNotifications = () => {
           let slackNotificationLastTime = slackNotification[0].notification_time;
           let offUntil = new Date(new Date(off[0].time).getTime() + (30 * 60000));
           let pendingList = await Promise.resolve(GetPendingList());
-          let pendingCount = pendingList.length;
-          let highest_height = pendingList[0].height;
+          let pendingCount = 0;
+          let highest_height = "null";
+          if (pendingList.length !== 0) {
+            pendingCount = pendingList.length;
+            highest_height = pendingList[0].height !== undefined ? pendingList[0].height : ("error finding height...", console.log("pendingList[0]", pendingList[0]));
+          }
 
           if (offUntil < new Date()) {
             console.log("Passed Off Timeout")
@@ -152,8 +156,12 @@ slackNotifications = () => {
           let slackNotificationLastTime = slackNotification[0].notification_time;
           let offUntil = new Date(new Date(off[0].time).getTime() + (parseInt(off[0].notificationtime) * 3600000));
           let pendingList = await Promise.resolve(GetPendingList());
-          let pendingCount = pendingList.length;
-          let highest_height = pendingList[0].height;
+          let pendingCount = 0;
+          let highest_height = "null";
+          if (pendingList.length !== 0) {
+            pendingCount = pendingList.length;
+            highest_height = pendingList[0].height !== undefined ? pendingList[0].height : ("error finding height...", console.log("pendingList[0]", pendingList[0]));
+          }
 
           if (offUntil < new Date()) {
             console.log("Passed Off Timeout")
