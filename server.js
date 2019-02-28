@@ -94,7 +94,7 @@ setupWebSocket = () => {
 setupWebSocket();
 
 GetLastSlackNotification = () => {
-  return SentToSlack.find({}, null, { sort: { notification_time: -1 } })
+  return SentToSlack.find({}, null, { sort: { notification_time: 1 } })
 }
 
 GetPendingList = () => {
@@ -122,7 +122,13 @@ slackNotifications = () => {
         console.log("CURRENT TIME: ", new Date());
         if (off[0].notificationtime === "30 minutes") {
           let slackNotification = await Promise.resolve(GetLastSlackNotification());
-          let slackNotificationLastTime = slackNotification[0].notification_time;
+          console.log("SLACKNOTI: ", slackNotification)
+          let slackNotificationLastTime = [];
+          if (slackNotification.length > 0) {
+            slackNotificationLastTime = slackNotification[0].notification_time;
+          }
+          console.log("slackNotificationLastTime", slackNotificationLastTime)
+
           let offUntil = new Date(new Date(off[0].time).getTime() + (30 * 60000));
           let pendingList = await Promise.resolve(GetPendingList());
           let pendingCount = 0;
@@ -136,14 +142,18 @@ slackNotifications = () => {
             console.log("Passed Off Timeout")
             if (pendingCount >= pend[0].notificationtime && pendingCount > 0) {
               console.log("Count more than User set Count")
-              if (pendingCount >= 10 && new Date(new Date(slackNotificationLastTime).getTime() + (30 * 60000)) < new Date()) {
-                console.log("Pending Count >= 10 AND its been over 30 minutes since Slack notification");
-                sendIt("line 168", pendingCount, highest_height)
-              } else if (pendingCount < 10 && new Date(new Date(slackNotificationLastTime).getTime() + (60 * 60000)) < new Date()) {
-                console.log("Pending Count < 10 AND its been over an hour since Slack notification");
-                sendIt("line 171", pendingCount, highest_height)
+              if (slackNotificationLastTime.length !== 0) {
+                if (pendingCount >= 10 && new Date(new Date(slackNotificationLastTime).getTime() + (30 * 60000)) < new Date()) {
+                  console.log("Pending Count >= 10 AND its been over 30 minutes since Slack notification");
+                  sendIt("line 141", pendingCount, highest_height)
+                } else if (pendingCount < 10 && new Date(new Date(slackNotificationLastTime).getTime() + (60 * 60000)) < new Date()) {
+                  console.log("Pending Count < 10 AND its been over an hour since Slack notification");
+                  sendIt("line 144", pendingCount, highest_height)
+                } else {
+                  console.log(`NO!!!! last Slack: ${new Date(slackNotificationLastTime)} and pendingCount: ${pendingCount}`)
+                }
               } else {
-                console.log(`NO!!!! last Slack: ${new Date(slackNotificationLastTime)} and pendingCount: ${pendingCount}`)
+                sendIt("line 156", pendingCount, highest_height)
               }
             } else {
               console.log(`Count: ${pendingCount} < User set count: ${pend[0].notificationtime}`)
@@ -154,6 +164,7 @@ slackNotifications = () => {
         } else {
           let slackNotification = await Promise.resolve(GetLastSlackNotification());
           let slackNotificationLastTime = slackNotification[0].notification_time;
+          console.log("slackNotificationLastTime", slackNotificationLastTime)
           let offUntil = new Date(new Date(off[0].time).getTime() + (parseInt(off[0].notificationtime) * 3600000));
           let pendingList = await Promise.resolve(GetPendingList());
           let pendingCount = 0;
@@ -212,7 +223,7 @@ slackNotifications = () => {
         }
       })
         .then(res => {
-          console.log("done");
+          console.log("done", new Date(), highest_height);
           let SaveData = new SentToSlack({
             notification_time: new Date(),
             highest_height: highest_height,

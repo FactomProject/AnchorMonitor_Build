@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const SentToSlackSchema = new mongoose.Schema({
     notification_time: {
-        type: String,
+        type: Date,
     },
     highest_height: {
         type: String,
