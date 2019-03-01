@@ -310,6 +310,49 @@ SingleBlock = () => {
   })
 }
 
+let needHighest = 181799;
+let needLowest = 181778
+GettingBackUp = () => {
+  // for (let i = needLowest; i <= needHighest; i++) {
+  axios({
+    method: "GET",
+    url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${181882}`,
+    headers: {
+      "Content-Type": "application/json",
+      "app_id": "c6bd4cff",
+      "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+    }
+  }).then((res) => {
+    let height = res.data.data.height;
+    let keymr = res.data.data.keymr;
+    let started_at = res.data.data.started_at;
+    let btc_hash = res.data.data.btc_transaction;
+    if (btc_hash === null) {
+      let SaveBlock = new FactomBlocks({
+        height: height,
+        keymr: keymr,
+        started_at: started_at,
+      })
+      console.log("SaveBlock: ", SaveBlock)
+      SaveBlock.save().then(() => {
+      }).catch(err => console.log("FactomBlocks Save Error: ", err));
+    } else {
+      let SaveBlock = new FactomBlocks({
+        height: height,
+        keymr: keymr,
+        started_at: started_at,
+        btc_hash: btc_hash
+      })
+      console.log("SaveBlock: ", SaveBlock)
+      SaveBlock.save().then(() => {
+      }).catch(err => console.log("FactomBlocks Save Error: ", err));
+    }
+  })
+  // }
+}
+
+// GettingBackUp();
+
 CheckSavedBitcoinMessages = () => {
   BlockchainDOTcom.find({}, (err, data) => {
     let sorted = data.sort((a, b) => {
@@ -322,7 +365,6 @@ CheckSavedBitcoinMessages = () => {
     }
   })
 }
-
 
 setInterval(() => {
   CheckSavedBitcoinMessages()
@@ -349,18 +391,12 @@ CheckSavedBitcoinMessages5minutes = () => {
   })
 }
 
-
-
 FindingConfirmations = () => {
   SingleBlock();
   axios({
     method: "GET",
     url: `https://api.blockcypher.com/v1/btc/main/addrs/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF?includeScript=true`
   }).then(res => {
-    // for (let keys in res.data) {
-    //   console.log("key: ", keys)
-    // }
-
     res.data.txrefs.forEach((trans) => {
       if (trans.confirmations > 0) {
         FactomBlocks.findOneAndUpdate({ btc_hash: trans.tx_hash }, { btc_conf: true }, (err, data) => {
