@@ -31,6 +31,10 @@ app.prepare().then(() => {
     return NotificationsOff.find({}, null, { sort: { time: -1 } })
   }
 
+  FindLastPendingNoti = () => {
+    return PendingNotifications.find({}, null, { sort: { time: -1 } })
+  }
+
   FindFactomsBitcoinBalance = () => {
     return axios({ method: "get", url: `https://blockchain.info/q/addressbalance/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF` })
       .then(res => { return res.data })
@@ -40,18 +44,19 @@ app.prepare().then(() => {
   server.get('/', async (req, res) => {
     let blockList = await Promise.resolve(FindFactomBlocks());
     let BTC_Balance = await Promise.resolve(FindFactomsBitcoinBalance());
+    let lastOff = await Promise.resolve(FindLastNotificationSetOff());
+    let pendingNoti = await Promise.resolve(FindLastPendingNoti());
 
-    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: blockList[blockList.length - 1].height - 1, balance: BTC_Balance })
+    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: blockList[blockList.length - 1].height - 1, balance: BTC_Balance, lastOff: lastOff[0].notificationtime, pendingNoti: pendingNoti[0].notificationtime })
   })
 
   server.get('/BTC', async (req, res) => {
     let blockList = await Promise.resolve(FindFactomBlocks());
     let BTC_Balance = await Promise.resolve(FindFactomsBitcoinBalance());
-    // FindLastNotificationSetOff()
     let lastOff = await Promise.resolve(FindLastNotificationSetOff());
-    console.log("lastOff: ", lastOff)
+    let pendingNoti = await Promise.resolve(FindLastPendingNoti());
 
-    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: blockList[blockList.length - 1].height - 1, balance: BTC_Balance, lastOff: lastOff[0].notificationtime })
+    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: blockList[blockList.length - 1].height - 1, balance: BTC_Balance, lastOff: lastOff[0].notificationtime, pendingNoti: pendingNoti[0].notificationtime })
   })
 
   server.get('/ETH', (req, res) => {
