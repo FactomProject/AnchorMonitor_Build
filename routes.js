@@ -43,8 +43,9 @@ app.prepare().then(() => {
   server.get('/BTC', async (req, res) => {
     let blockList = await Promise.resolve(FindFactomBlocks());
     let BTC_Balance = await Promise.resolve(FindFactomsBitcoinBalance());
+    console.log(blockList[blockList.length - 1])
 
-    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: blockList[blockList.length - 1].height - 1, balance: BTC_Balance })
+    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: 0, balance: BTC_Balance })
   })
 
   server.get('/ETH', (req, res) => {

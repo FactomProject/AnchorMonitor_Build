@@ -271,42 +271,44 @@ SingleBlock = () => {
   FindingBTCHASH()
   FactomBlocks.find({ btc_hash: { $exists: false } }, (err, data) => {
     err ? console.log("Err in find", err) : console.log("without btc_hash: ", data)
-    data.forEach((block) => {
-      axios({
-        method: "GET",
-        url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${block.keymr}`,
-        headers: {
-          "Content-Type": "application/json",
-          "app_id": "c6bd4cff",
-          "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
-        }
-      }).then(res => {
-        if (res.data.data.btc_transaction !== null) {
-          axios({
-            method: "GET",
-            url: `https://blockchain.info/rawtx/${res.data.data.btc_transaction}`
-          }).then(blockres => {
-            let outScript = blockres.data.out[1].script;
-            let keyMR = outScript.substring(outScript.length - 64, outScript.length);
-            let height = parseInt(outScript.substring(12, 20), 16);
-            let transHash = blockres.data.hash;
-            let time = blockres.data.time;
+    if (data.length > 0) {
+      data.forEach((block) => {
+        axios({
+          method: "GET",
+          url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${block.keymr}`,
+          headers: {
+            "Content-Type": "application/json",
+            "app_id": "c6bd4cff",
+            "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+          }
+        }).then(res => {
+          if (res.data.data.btc_transaction !== null) {
+            axios({
+              method: "GET",
+              url: `https://blockchain.info/rawtx/${res.data.data.btc_transaction}`
+            }).then(blockres => {
+              let outScript = blockres.data.out[1].script;
+              let keyMR = outScript.substring(outScript.length - 64, outScript.length);
+              let height = parseInt(outScript.substring(12, 20), 16);
+              let transHash = blockres.data.hash;
+              let time = blockres.data.time;
 
-            let SaveData = new BlockchainDOTcom({
-              script: outScript,
-              keymr: keyMR,
-              height: height,
-              btc_trans_hash: transHash,
-              time: time,
-            })
-            SaveData.save().then(() => {
-              FactomBlocks.findOneAndUpdate({ keymr: keyMR }, { btc_hash: transHash }, (err, data) => {
+              let SaveData = new BlockchainDOTcom({
+                script: outScript,
+                keymr: keyMR,
+                height: height,
+                btc_trans_hash: transHash,
+                time: time,
               })
-            }).catch(err => console.log("BlockchainDOTcom Save Error: ", err));
-          }).catch(err => console.log("Blockchain.com Error: ", err.response))
-        }
-      }).catch(err => console.log("SingleBlock Error: ", err))
-    })
+              SaveData.save().then(() => {
+                FactomBlocks.findOneAndUpdate({ keymr: keyMR }, { btc_hash: transHash }, (err, data) => {
+                })
+              }).catch(err => console.log("BlockchainDOTcom Save Error: ", err));
+            }).catch(err => console.log("Blockchain.com Error: ", err.response))
+          }
+        }).catch(err => console.log("SingleBlock Error: ", err))
+      })
+    }
   })
 }
 
@@ -432,8 +434,7 @@ FindingBTCHASH = () => {
 
 setInterval(() => {
   CheckSavedBitcoinMessages5minutes()
-  FindingConfirmations()
   FindingBTCHASH()
+  FindingConfirmations()
   SingleBlock();
 }, 300010)
-
