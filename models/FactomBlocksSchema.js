@@ -18,6 +18,10 @@ const FactomBlocksSchema = new mongoose.Schema({
         unique: true,
         sparse: true,
     },
+    btc_conf: {
+        type: Boolean,
+        sparse: true,
+    }
 });
 
 module.exports = mongoose.model('FactomBlocks', FactomBlocksSchema)
