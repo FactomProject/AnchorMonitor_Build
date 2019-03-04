@@ -5,7 +5,7 @@ const PendingNotificationsSchema = new mongoose.Schema({
         type: String,
     },
     time: {
-        type: String,
+        type: Date,
     },
 });
 

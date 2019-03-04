@@ -5,7 +5,7 @@ const NotificationsOffSchema = new mongoose.Schema({
         type: String,
     },
     time: {
-        type: String,
+        type: Date,
     },
 });
 

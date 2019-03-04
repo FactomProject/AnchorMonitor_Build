@@ -11,6 +11,7 @@ export default class Main extends Component {
             name: props.name === 'BTC' ? 'Bitcoin' : props.name === 'ETH' ? 'Ethereum' : null,
             offNotiToggle: false,
             pendingNotiToggle: false,
+            lastOff: this.props.lastOff,
         }
 
         this.showMenuOffNoti = this.showMenuOffNoti.bind(this);
@@ -25,8 +26,8 @@ export default class Main extends Component {
         }, 2000)
     }
 
-    static getInitialProps({ query: { name, data, lastConf, balance } }) {
-        return { name: name, data: data, lastConf: lastConf, balance: balance }
+    static getInitialProps({ query: { name, data, lastConf, balance, lastOff } }) {
+        return { name: name, data: data, lastConf: lastConf, balance: balance, lastOff: lastOff }
     }
 
     showMenuOffNoti = (event) => {
@@ -44,9 +45,15 @@ export default class Main extends Component {
 
     offNotiSelect = (event) => {
         if (event.target.value === 30) {
-            axios.post(`http://localhost:3000/offnotificationchange`, null, { params: { time: "30 minutes" } })
+            axios.post(`http://localhost:3000/offnotificationchange`, null, { params: { time: "30 Minutes" } })
+            this.setState({
+                lastOff: "30 Minutes"
+            })
         } else {
-            axios.post(`http://localhost:3000/offnotificationchange`, null, { params: { time: event.target.value } })
+            axios.post(`http://localhost:3000/offnotificationchange`, null, { params: { time: event.target.value } }).then(this.forceUpdate())
+            this.setState({
+                lastOff: event.target.value
+            })
         }
     }
 
@@ -68,9 +75,13 @@ export default class Main extends Component {
     }
 
     render() {
-        let { name, pendingNotiToggle, offNotiToggle } = this.state;
+        let { name, pendingNotiToggle, offNotiToggle, lastOff } = this.state;
         let { data, lastConf, balance } = this.props;
-        let holder = "30 Minutes"
+        console.log("lastOff: ", lastOff)
+        let offHolder = "30 Minutes";
+        if (lastOff !== offHolder) {
+            offHolder = (lastOff === "1" || lastOff === 1) ? "1 hour" : `${lastOff} hours`
+        }
         let countHolder = "1 Block"
 
         return (
@@ -84,7 +95,12 @@ export default class Main extends Component {
                                     <div className="tableHeaderContent">
                                         <div className="select" style={{ gridArea: "offNoti ", display: "grid", gridTemplateColumns: "255px 130px" }}>
                                             <small style={{ justifySelf: "start" }}>Turn off notifications for: </small>
-                                            <span className="placeholder " onClick={this.showMenuOffNoti}>{holder}</span>
+                                            <span className={`placeholder 
+                                                            ${offHolder.length === "30 Minutes".length ? "" : null}
+                                                            ${offHolder.length === "1 hour".length ? "short" : null}
+                                                            ${offHolder.length === "3 hours".length ? "singlehours" : null}
+                                                            ${offHolder.length === "12 hours".length ? "doublehours" : null}
+                                                            `} onClick={this.showMenuOffNoti}>{offHolder}</span>
                                             {offNotiToggle ? (
                                                 <ul>
                                                     <li onClick={this.offNotiSelect} value="30">30 Minutes</li>
@@ -454,6 +470,15 @@ export default class Main extends Component {
                         z-index: 10;
                         font-size: 70%;
                     }
+                    .short:after {
+                        margin-left: 5.5em;
+                    }
+                    .singlehours:after {
+                        margin-left: 4.5em;
+                    }
+                    .doublehours:after {
+                        margin-left: 3.8em;
+                    }
                     .small:after {
                         position: absolute;
                         margin-left: 4.7em;
@@ -503,7 +528,7 @@ export default class Main extends Component {
                         .tableHeaderContent {
                             display: grid;
                             grid-template-columns: auto;
-                            grid-template-rows:  auto 1fr 25px;
+                            grid-template-rows:  auto 1fr 45px;
                             grid-template-areas: 
                                 "offNoti"
                                 "pendingNoti"
@@ -513,6 +538,10 @@ export default class Main extends Component {
                         }
                         .tableHeaderContent small {
                             justify-self: start;
+                        }
+                        .HeroGroup {
+                            padding: 30px 20px;
+                            grid-template-rows: 10rem minmax(300px,720px) 2fr;
                         }
                     }
                     @media (max-width: 700px) {

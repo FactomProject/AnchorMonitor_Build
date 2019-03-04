@@ -98,20 +98,8 @@ GetLastSlackNotification = () => {
 }
 
 GetPendingList = () => {
-  let no_btc_hash = [];
   return FactomBlocks.find({ btc_conf: { $exists: false } }, null, { sort: { height: -1 } }, (err, data) => {
-    // for (let i = 0; i <= data.length - 1; i++) {
-    //   if (data[i].btc_conf === undefined) {
-    //     no_btc_hash.push(data[i])
-    //   }
-    // }
   })
-  // .then(() => {
-  //   setTimeout(() => {
-  //     console.log("no_btc_hash: ", no_btc_hash);
-  //     return no_btc_hash;
-  //   }, 100)
-  // })
 }
 
 slackNotifications = () => {
@@ -312,45 +300,45 @@ SingleBlock = () => {
   })
 }
 
-let needHighest = 181799;
-let needLowest = 181778
+let needHighest = 182300;
+let needLowest = 182258;
 GettingBackUp = () => {
-  // for (let i = needLowest; i <= needHighest; i++) {
-  axios({
-    method: "GET",
-    url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${181882}`,
-    headers: {
-      "Content-Type": "application/json",
-      "app_id": "c6bd4cff",
-      "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
-    }
-  }).then((res) => {
-    let height = res.data.data.height;
-    let keymr = res.data.data.keymr;
-    let started_at = res.data.data.started_at;
-    let btc_hash = res.data.data.btc_transaction;
-    if (btc_hash === null) {
-      let SaveBlock = new FactomBlocks({
-        height: height,
-        keymr: keymr,
-        started_at: started_at,
-      })
-      console.log("SaveBlock: ", SaveBlock)
-      SaveBlock.save().then(() => {
-      }).catch(err => console.log("FactomBlocks Save Error: ", err));
-    } else {
-      let SaveBlock = new FactomBlocks({
-        height: height,
-        keymr: keymr,
-        started_at: started_at,
-        btc_hash: btc_hash
-      })
-      console.log("SaveBlock: ", SaveBlock)
-      SaveBlock.save().then(() => {
-      }).catch(err => console.log("FactomBlocks Save Error: ", err));
-    }
-  })
-  // }
+  for (let i = needLowest; i <= needHighest; i++) {
+    axios({
+      method: "GET",
+      url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${i}`,
+      headers: {
+        "Content-Type": "application/json",
+        "app_id": "c6bd4cff",
+        "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+      }
+    }).then((res) => {
+      let height = res.data.data.height;
+      let keymr = res.data.data.keymr;
+      let started_at = res.data.data.started_at;
+      let btc_hash = res.data.data.btc_transaction;
+      if (btc_hash === null) {
+        let SaveBlock = new FactomBlocks({
+          height: height,
+          keymr: keymr,
+          started_at: started_at,
+        })
+        console.log("SaveBlock: ", SaveBlock)
+        SaveBlock.save().then(() => {
+        }).catch(err => console.log("FactomBlocks Save Error: ", err));
+      } else {
+        let SaveBlock = new FactomBlocks({
+          height: height,
+          keymr: keymr,
+          started_at: started_at,
+          btc_hash: btc_hash
+        })
+        console.log("SaveBlock: ", SaveBlock)
+        SaveBlock.save().then(() => {
+        }).catch(err => console.log("FactomBlocks Save Error: ", err));
+      }
+    })
+  }
 }
 
 // GettingBackUp();
@@ -413,21 +401,23 @@ FindingConfirmations = () => {
 FindingBTCHASH = () => {
   FactomBlocks.find({ btc_hash: { $exists: false } }, (err, data) => {
     if (err) console.log("Err in find FindingBTCHASH", err)
-    data.forEach((block) => {
-      axios({
-        method: "GET",
-        url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
-      }).then(res => {
-        res.data.txs.forEach(tx => {
-          let keymr = tx.out[1].script.substring(tx.out[1].script.length - 64, tx.out[1].script.length)
-          if (keymr === block.keymr) {
-            FactomBlocks.findOneAndUpdate({ keymr: block.keymr }, { btc_hash: tx.hash }, (err, data) => {
-              if (err) console.log("Err in find", err)
-            })
-          }
-        })
-      }).catch(err => { console.log("FindingBTCHASH ERROR: ", err) })
-    })
+    if (data.length > 0) {
+      data.forEach((block) => {
+        axios({
+          method: "GET",
+          url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
+        }).then(res => {
+          res.data.txs.forEach(tx => {
+            let keymr = tx.out[1].script.substring(tx.out[1].script.length - 64, tx.out[1].script.length)
+            if (keymr === block.keymr) {
+              FactomBlocks.findOneAndUpdate({ keymr: block.keymr }, { btc_hash: tx.hash }, (err, data) => {
+                if (err) console.log("Err in find", err)
+              })
+            }
+          })
+        }).catch(err => { console.log("FindingBTCHASH ERROR: ", err) })
+      })
+    }
   })
 }
 

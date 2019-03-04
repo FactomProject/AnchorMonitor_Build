@@ -3,7 +3,7 @@ const express = require('express')
 const axios = require("axios");
 const mongoose = require('mongoose');
 const FactomBlocks = require('./models/FactomBlocksSchema');
-const NotifactionsOff = require('./models/NotificationsOff');
+const NotificationsOff = require('./models/NotificationsOff');
 const PendingNotifications = require('./models/PendingNotifications');
 
 require('dotenv').config();
@@ -27,6 +27,10 @@ app.prepare().then(() => {
     return FactomBlocks.find({ btc_conf: { $exists: false } }, null, { sort: { height: -1 } })
   }
 
+  FindLastNotificationSetOff = () => {
+    return NotificationsOff.find({}, null, { sort: { time: -1 } })
+  }
+
   FindFactomsBitcoinBalance = () => {
     return axios({ method: "get", url: `https://blockchain.info/q/addressbalance/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF` })
       .then(res => { return res.data })
@@ -43,9 +47,11 @@ app.prepare().then(() => {
   server.get('/BTC', async (req, res) => {
     let blockList = await Promise.resolve(FindFactomBlocks());
     let BTC_Balance = await Promise.resolve(FindFactomsBitcoinBalance());
-    console.log(blockList[blockList.length - 1])
+    // FindLastNotificationSetOff()
+    let lastOff = await Promise.resolve(FindLastNotificationSetOff());
+    console.log("lastOff: ", lastOff)
 
-    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: 0, balance: BTC_Balance })
+    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: blockList[blockList.length - 1].height - 1, balance: BTC_Balance, lastOff: lastOff[0].notificationtime })
   })
 
   server.get('/ETH', (req, res) => {
@@ -54,7 +60,7 @@ app.prepare().then(() => {
 
 
   server.post('/offnotificationchange', (req, res) => {
-    let SaveData = new NotifactionsOff({
+    let SaveData = new NotificationsOff({
       notificationtime: req.query.time,
       time: new Date(),
     })
