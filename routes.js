@@ -44,8 +44,10 @@ app.prepare().then(() => {
   server.get('/', async (req, res) => {
     let blockList = await Promise.resolve(FindFactomBlocks());
     let BTC_Balance = await Promise.resolve(FindFactomsBitcoinBalance());
+    let lastOff = await Promise.resolve(FindLastNotificationSetOff());
+    let pendingNoti = await Promise.resolve(FindLastPendingNoti());
 
-    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: blockList[blockList.length - 1].height - 1, balance: BTC_Balance })
+    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: blockList[blockList.length - 1].height - 1, balance: BTC_Balance, lastOff: lastOff[0].notificationtime, pendingNoti: pendingNoti[0].notificationtime })
   })
 
   server.get('/BTC', async (req, res) => {
@@ -53,7 +55,6 @@ app.prepare().then(() => {
     let BTC_Balance = await Promise.resolve(FindFactomsBitcoinBalance());
     let lastOff = await Promise.resolve(FindLastNotificationSetOff());
     let pendingNoti = await Promise.resolve(FindLastPendingNoti());
-    console.log("pendingNoti: ", pendingNoti)
 
     return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: blockList[blockList.length - 1].height - 1, balance: BTC_Balance, lastOff: lastOff[0].notificationtime, pendingNoti: pendingNoti[0].notificationtime })
   })
