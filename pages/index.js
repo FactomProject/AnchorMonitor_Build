@@ -12,6 +12,7 @@ export default class Main extends Component {
             offNotiToggle: false,
             pendingNotiToggle: false,
             lastOff: this.props.lastOff,
+            pendingNoti: this.props.pendingNoti,
         }
 
         this.showMenuOffNoti = this.showMenuOffNoti.bind(this);
@@ -26,8 +27,8 @@ export default class Main extends Component {
         }, 2000)
     }
 
-    static getInitialProps({ query: { name, data, lastConf, balance, lastOff } }) {
-        return { name: name, data: data, lastConf: lastConf, balance: balance, lastOff: lastOff }
+    static getInitialProps({ query: { name, data, lastConf, balance, lastOff, pendingNoti } }) {
+        return { name: name, data: data, lastConf: lastConf, balance: balance, lastOff: lastOff, pendingNoti: pendingNoti }
     }
 
     showMenuOffNoti = (event) => {
@@ -71,18 +72,21 @@ export default class Main extends Component {
     }
 
     pendingNotiSelect = (event) => {
-        axios.post(`http://localhost:3000/pendingtimenotification`, null, { params: { time: event.target.value } })
+        axios.post(`http://localhost:3000/pendingtimenotification`, null, { params: { time: event.target.value } });
+        this.setState({
+            pendingNoti: event.target.value
+        })
     }
 
     render() {
-        let { name, pendingNotiToggle, offNotiToggle, lastOff } = this.state;
+        let { name, pendingNotiToggle, offNotiToggle, lastOff, pendingNoti } = this.state;
         let { data, lastConf, balance } = this.props;
-        console.log("lastOff: ", lastOff)
         let offHolder = "30 Minutes";
         if (lastOff !== offHolder) {
             offHolder = (lastOff === "1" || lastOff === 1) ? "1 hour" : `${lastOff} hours`
         }
-        let countHolder = "1 Block"
+        let countHolder = "1 Block";
+        countHolder = (pendingNoti === 1 || pendingNoti === "1") ? `${pendingNoti} Block` : `${pendingNoti} Blocks`;
 
         return (
             <Layout title='Bitcoin Anchors'>
@@ -116,7 +120,12 @@ export default class Main extends Component {
                                         </div>
                                         <div className="select" style={{ gridArea: "pendingNoti", display: "grid", gridTemplateColumns: "255px 130px" }}>
                                             <small style={{ justifySelf: "start" }}>Pending count before notifying: </small>
-                                            <span className="placeholder small" onClick={this.showMenuPendingNoti}>{countHolder}</span>
+                                            <span className={`placeholder 
+                                                            ${countHolder.length === "1 Block".length ? "small" : null}
+                                                            ${countHolder.length === "2 Blocks".length ? "doublehours" : null}
+                                                            ${countHolder.length === "18 Blocks".length ? "doubleblks" : null}
+                                                            ${countHolder.length === "144 Blocks".length ? "tripleblks" : null}
+                                                            `} onClick={this.showMenuPendingNoti}>{countHolder}</span>
                                             {pendingNotiToggle ? (
                                                 <ul>
                                                     <li onClick={this.pendingNotiSelect} value="1">1 Block</li>
@@ -166,9 +175,14 @@ export default class Main extends Component {
                                     <div className="HeroGroupHeader">
                                         <h1>Pending {name} Anchors</h1>
                                         <div className="tableHeaderContent">
-                                            <div className="select" style={{ gridArea: "offNoti ", display: "grid", gridTemplateColumns: "230px 130px" }}>
+                                            <div className="select" style={{ gridArea: "offNoti ", display: "grid", gridTemplateColumns: "255px 130px" }}>
                                                 <small style={{ justifySelf: "start" }}>Turn off notifications for: </small>
-                                                <span className="placeholder" onClick={this.showMenuOffNoti}>{holder}</span>
+                                                <span className={`placeholder 
+                                                            ${offHolder.length === "30 Minutes".length ? "" : null}
+                                                            ${offHolder.length === "1 hour".length ? "short" : null}
+                                                            ${offHolder.length === "3 hours".length ? "singlehours" : null}
+                                                            ${offHolder.length === "12 hours".length ? "doublehours" : null}
+                                                            `} onClick={this.showMenuOffNoti}>{offHolder}</span>
                                                 {offNotiToggle ? (
                                                     <ul>
                                                         <li onClick={this.offNotiSelect} value="30">30 Minutes</li>
@@ -177,24 +191,29 @@ export default class Main extends Component {
                                                         <li onClick={this.offNotiSelect} value="6">6 hours</li>
                                                         <li onClick={this.offNotiSelect} value="9">9 hours</li>
                                                         <li onClick={this.offNotiSelect} value="12">12 hours</li>
-                                                        <li onClick={this.offNotiSelect} value="24">1 Day</li>
+                                                        <li onClick={this.offNotiSelect} value="24">24 hours</li>
                                                     </ul>
                                                 ) : (null)}
                                                 <input type="hidden" name="changeme" />
                                             </div>
-                                            <div className="select" style={{ gridArea: "pendingNoti", display: "grid", gridTemplateColumns: "230px 130px" }}>
-                                                <small style={{ justifySelf: "start" }}># of blocks before notifying: </small>
-                                                <span className="placeholder" onClick={this.showMenuPendingNoti}>{holder}</span>
+                                            <div className="select" style={{ gridArea: "pendingNoti", display: "grid", gridTemplateColumns: "255px 130px" }}>
+                                                <small style={{ justifySelf: "start" }}>Pending count before notifying: </small>
+                                                <span className={`placeholder 
+                                                            ${countHolder.length === "1 Block".length ? "small" : null}
+                                                            ${countHolder.length === "2 Blocks".length ? "doublehours" : null}
+                                                            ${countHolder.length === "18 Blocks".length ? "doubleblks" : null}
+                                                            ${countHolder.length === "144 Blocks".length ? "tripleblks" : null}
+                                                            `} onClick={this.showMenuPendingNoti}>{countHolder}</span>
                                                 {pendingNotiToggle ? (
                                                     <ul>
-                                                        <li onClick={this.pendingNotiSelect} value="1">1 block</li>
-                                                        <li onClick={this.pendingNotiSelect} value="2">2 blocks</li>
-                                                        <li onClick={this.pendingNotiSelect} value="4">4 blocks</li>
-                                                        <li onClick={this.pendingNotiSelect} value="9">9 blocks</li>
-                                                        <li onClick={this.pendingNotiSelect} value="18">18 blocks</li>
-                                                        <li onClick={this.pendingNotiSelect} value="36">36 blocks</li>
-                                                        <li onClick={this.pendingNotiSelect} value="72">72 blocks</li>
-                                                        <li onClick={this.pendingNotiSelect} value="144">144 blocks</li>
+                                                        <li onClick={this.pendingNotiSelect} value="1">1 Block</li>
+                                                        <li onClick={this.pendingNotiSelect} value="2">2 Blocks</li>
+                                                        <li onClick={this.pendingNotiSelect} value="4">4 Blocks</li>
+                                                        <li onClick={this.pendingNotiSelect} value="9">9 Blocks</li>
+                                                        <li onClick={this.pendingNotiSelect} value="18">18 Blocks</li>
+                                                        <li onClick={this.pendingNotiSelect} value="36">36 Blocks</li>
+                                                        <li onClick={this.pendingNotiSelect} value="72">72 Blocks</li>
+                                                        <li onClick={this.pendingNotiSelect} value="144">144 Blocks</li>
                                                     </ul>
                                                 ) : (null)}
                                                 <input type="hidden" name="changeme" />
@@ -202,7 +221,7 @@ export default class Main extends Component {
                                             <small style={{ gridArea: "otherHeaderInfo" }}>Last Anchor: {lastConf} | Address Balance: {balance * 0.00000001} | Count: {data.length} | </small>
                                         </div>
                                     </div>
-                                    <div className="NoAnchors"><h1>No pending Anchors!</h1></div>
+                                    <div className="NoAnchors"><h1 style={{ marginTop: "20%" }}>No pending Anchors!</h1></div>
                                 </div>
                             )
                     ) : (
@@ -285,6 +304,9 @@ export default class Main extends Component {
                         border-collapse: collapse;
                         text-align: left;
                         white-space: nowrap;
+                    }
+                    .NoAnchors {
+                        justify-self: center;
                     }
 
                     #style-7::-webkit-scrollbar-track {
@@ -478,6 +500,12 @@ export default class Main extends Component {
                     }
                     .doublehours:after {
                         margin-left: 3.8em;
+                    }
+                    .doubleblks:after {
+                        margin-left: 3.25em;
+                    }
+                    .tripleblks:after {
+                        margin-left: 2.3em;
                     }
                     .small:after {
                         position: absolute;
