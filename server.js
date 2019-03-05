@@ -107,7 +107,6 @@ slackNotifications = () => {
     if (err) console.log("Err in find", err);
     else {
       PendingNotifications.find({}, null, { sort: { time: -1 } }, async (err, pend) => {
-        console.log("CURRENT TIME: ", new Date());
         if (off[0].notificationtime === "30 minutes") {
           let slackNotification = await Promise.resolve(GetLastSlackNotification());
           let slackNotificationLastTime = [];
@@ -125,27 +124,17 @@ slackNotifications = () => {
           }
 
           if (offUntil < new Date()) {
-            console.log("Passed Off Timeout")
             if (pendingCount >= pend[0].notificationtime && pendingCount > 0) {
-              console.log("Count more than User set Count")
               if (slackNotificationLastTime.length !== 0) {
                 if (pendingCount >= 10 && new Date(new Date(slackNotificationLastTime).getTime() + (30 * 60000)) < new Date()) {
-                  console.log("Pending Count >= 10 AND its been over 30 minutes since Slack notification");
                   sendIt("line 141", pendingCount, highest_height)
                 } else if (pendingCount < 10 && new Date(new Date(slackNotificationLastTime).getTime() + (60 * 60000)) < new Date()) {
-                  console.log("Pending Count < 10 AND its been over an hour since Slack notification");
                   sendIt("line 144", pendingCount, highest_height)
-                } else {
-                  console.log(`NO!!!! last Slack: ${new Date(slackNotificationLastTime)} and pendingCount: ${pendingCount}`)
                 }
               } else {
                 sendIt("line 156", pendingCount, highest_height)
               }
-            } else {
-              console.log(`Count: ${pendingCount} < User set count: ${pend[0].notificationtime}`)
             }
-          } else {
-            console.log("User set Notification Off until: ", offUntil)
           }
         } else {
           let slackNotification = await Promise.resolve(GetLastSlackNotification());
@@ -163,31 +152,19 @@ slackNotifications = () => {
           }
 
           if (offUntil < new Date()) {
-            console.log("Passed Off Timeout")
             if (pendingCount >= pend[0].notificationtime && pendingCount > 0) {
-              console.log("Count more than User set Count")
               if (pendingCount >= 10 && new Date(new Date(slackNotificationLastTime).getTime() + (30 * 60000)) < new Date()) {
-                console.log("Pending Count >= 10 AND its been over 30 minutes since Slack notification");
                 sendIt("line 168", pendingCount, highest_height)
               } else if (pendingCount < 10 && new Date(new Date(slackNotificationLastTime).getTime() + (60 * 60000)) < new Date()) {
-                console.log("Pending Count < 10 AND its been over an hour since Slack notification");
                 sendIt("line 171", pendingCount, highest_height)
-              } else {
-                console.log(`NO!!!! last Slack: ${new Date(slackNotificationLastTime)} and pendingCount: ${pendingCount}`)
               }
-            } else {
-              console.log(`Count: ${pendingCount} < User set count: ${pend[0].notificationtime}`)
             }
-          } else {
-            console.log("User set Notification Off until: ", offUntil)
           }
         }
       })
     }
   })
   function sendIt(whereFrom, pendingCount, highest_height) {
-    console.log("Send it called!", whereFrom);
-    console.log("pending: ", pendingCount)
     if (pendingCount > 0) {
       axios({
         method: "post",
@@ -233,7 +210,7 @@ setInterval(() => {
 CallHarm = () => {
   axios({
     method: "GET",
-    url: "https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks",
+    url: "https://api.factom.com/v1/dblocks",
     headers: {
       "Content-Type": "application/json",
       "app_id": "c6bd4cff",
@@ -263,7 +240,7 @@ SingleBlock = () => {
       data.forEach((block) => {
         axios({
           method: "GET",
-          url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${block.keymr}`,
+          url: `https://api.factom.com/v1/dblocks/${block.keymr}`,
           headers: {
             "Content-Type": "application/json",
             "app_id": "c6bd4cff",
@@ -306,7 +283,7 @@ GettingBackUp = () => {
   for (let i = needLowest; i <= needHighest; i++) {
     axios({
       method: "GET",
-      url: `https://connect-mainnet-2445582615332.production.gw.apicast.io/v1/dblocks/${i}`,
+      url: `https://api.factom.com/v1/dblocks/${i}`,
       headers: {
         "Content-Type": "application/json",
         "app_id": "c6bd4cff",
