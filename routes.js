@@ -48,10 +48,7 @@ app.prepare().then(() => {
     let pendingNoti = await Promise.resolve(FindLastPendingNoti());
     let last = blockList[0].height;
     for (let i = 1; i < blockList.length; i++) {
-      if (last - 1 !== blockList[i].height) {
-        console.log("This One: ", last - 1)
-        break;
-      }
+      if (last - 1 !== blockList[i].height) { break; }
       last = blockList[i].height;
     }
 
@@ -65,10 +62,7 @@ app.prepare().then(() => {
     let pendingNoti = await Promise.resolve(FindLastPendingNoti());
     let last = blockList[0].height;
     for (let i = 1; i < blockList.length; i++) {
-      if (last - 1 !== blockList[i].height) {
-        console.log("This One: ", last - 1)
-        break;
-      }
+      if (last - 1 !== blockList[i].height) { break; }
       last = blockList[i].height;
     }
 

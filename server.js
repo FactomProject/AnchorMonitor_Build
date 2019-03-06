@@ -176,7 +176,7 @@ slackNotifications = () => {
           attachments: [
             {
               color: "#FFB233",
-              text: `<http://3.16.108.148s:3000/BTC> for more information.`,
+              text: `<http://3.16.108.148:3000/BTC> for more information.`,
               fields: [
                 {
                   title: `${pendingCount} Pending Bitcoin Anchors`,
