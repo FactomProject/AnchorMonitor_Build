@@ -17,34 +17,25 @@ mongoose.connection
   .on('connected', () => { console.log(`Connected to database`), CallHarm() })
   .on('error', (err) => { console.log(`Connection error: ${err.message}`) });
 
-// GraphQL schema
-var schema = buildSchema(`
-type Query {
-  message: String
-}
-`);
-// Root resolver
-var root = {
-  message: () => 'Hello World!'
-};
-// Create an express server and a GraphQL endpoint
-var app = express();
-app.use('/graphql', express_graphql({
-  schema: schema,
-  rootValue: root,
-  graphiql: true
-}));
-let vep = app.listen(6001, () => console.log(`Express GraphQL Server Now Running On ${vep.address().port}`));
+let app = express();
+let vep = app.listen(6001, () => console.log(`Express Server Now Running On ${vep.address().port}`));
+
+global.APICOUNT = 840;
 
 // Socket to listen to Factoms address on Blockchain.com
 setupWebSocket = () => {
   let client = new W3CWebSocket('wss://ws.blockchain.info/inv');
-  client.onerror = function () {
-    console.log('Connection Error');
+  // let ethClient = new W3CWebSocket('wss://ws.blockchain.info/inv');
+
+  client.onerror = function (error) {
+    console.log('Connection Error Bitcoin', error);
   };
+  // ethClient.onerror = function (erroe) {
+  //   console.log('Connection Error Ethereum', error);
+  // };
 
   client.onopen = function () {
-    console.log('WebSocket Client Connected');
+    console.log('WebSocket Client Bitcoin Connected');
 
     function sendNumber() {
       if (client.readyState === client.OPEN) {
@@ -57,14 +48,33 @@ setupWebSocket = () => {
 
     sendNumber();
   };
+  // ethClient.onopen = function () {
+  //   console.log('WebSocket Client Ethereum Connected');
+
+  //   function sendNumber() {
+  //     if (ethClient.readyState === ethClient.OPEN) {
+  //       ethClient.send(`{"op":"addr_sub", "addr":"0x334A31B3d9DE02e9B88FB3308a4406dF14D4Ae17"}`);
+  //     }
+  //   }
+  //   setInterval(() => {
+  //     sendNumber();
+  //   }, 300000)
+
+  //   sendNumber();
+  // };
 
   client.onclose = function () {
-    console.log('echo-protocol Client Closed WHYYYYYYY');
+    console.log('echo-protocol Client Bitcoin Closed');
     setTimeout(setupWebSocket, 1000)
   };
+  // ethClient.onclose = function () {
+  //   console.log('echo-protocol Client Ethereum Closed');
+  //   setTimeout(setupWebSocket, 1000)
+  // };
 
   client.onmessage = function (e) {
     CallHarm();
+    FindingBTCHASH("From client.onmessage");
     setTimeout(() => {
       if (typeof e.data === 'string') {
         let obj = JSON.parse(e.data);
@@ -89,6 +99,39 @@ setupWebSocket = () => {
       }
     }, 1000)
   };
+  // ethClient.onmessage = function (e) {
+  //   setTimeout(() => {
+  //     if (typeof e.data === 'string') {
+  //       axios({
+  //         method: "post",
+  //         url:
+  //           "https://hooks.slack.com/services/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",
+  //         headers: { "Content-type": "application/json" },
+  //         data: {
+  //           text: "",
+  //           attachments: [
+  //             {
+  //               color: "#FFB233",
+  //               text: `${e.data}`,
+  //               fields: [
+  //                 {
+  //                   title: `${pendingCount} Pending Bitcoin Anchors`,
+  //                   short: true
+  //                 }
+  //               ],
+  //             }
+  //           ]
+  //         }
+  //       })
+  //         .then(res => {
+  //           console.log("done", new Date(), highest_height);
+  //         })
+  //         .catch(err => {
+  //           console.log("Or THIS??", err);
+  //         });
+  //     }
+  //   }, 1000)
+  // };
 }
 
 setupWebSocket();
@@ -232,12 +275,19 @@ setInterval(() => {
   CallHarm()
 }, 300000)
 
-SingleBlock = () => {
-  FindingBTCHASH()
-  FactomBlocks.find({ btc_hash: { $exists: false } }, (err, data) => {
-    err ? console.log("Err in find", err) : console.log("without btc_hash: ", data)
+SingleBlock = (whereFrom) => {
+  console.log("Where From: ", whereFrom)
+  let top = 5;
+  if (whereFrom === "FindingBTCHASH") {
+    top = 50;
+  }
+  // FindingBTCHASH()
+  FactomBlocks.find({ btc_hash: { $exists: false } }, null, { sort: { height: 1 } }, (err, data) => {
+    err ? console.log("Err in find", err) : console.log("without btc_hash: ", data.splice(0, top))
+    console.log("top: ", top)
+    var BreakException = {};
     if (data.length > 0) {
-      data.forEach((block) => {
+      data.splice(0, top).forEach((block) => {
         axios({
           method: "GET",
           url: `https://api.factom.com/v1/dblocks/${block.keymr}`,
@@ -247,6 +297,8 @@ SingleBlock = () => {
             "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
           }
         }).then(res => {
+          APICOUNT++;
+          console.log("APICOUNT++ SingleBlock then")
           if (res.data.data.btc_transaction !== null) {
             axios({
               method: "GET",
@@ -270,15 +322,26 @@ SingleBlock = () => {
                 })
               }).catch(err => console.log("BlockchainDOTcom Save Error: ", err));
             }).catch(err => console.log("Blockchain.com Error: ", err.response))
+          } else {
+            console.log("BREAK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            Break()
           }
-        }).catch(err => console.log("SingleBlock Error: ", err))
+        }).catch(err => {
+          if (err !== BreakException) throw e;
+          console.log("SingleBlock Error: ", err)
+          APICOUNT++;
+          console.log("APICOUNT++ SingleBlock catch")
+        })
+        function Break() {
+          throw BreakException;
+        }
       })
     }
   })
 }
 
-let needHighest = 182300;
-let needLowest = 182258;
+let needHighest = 186499;
+let needLowest = 186372;
 GettingBackUp = () => {
   for (let i = needLowest; i <= needHighest; i++) {
     axios({
@@ -359,7 +422,6 @@ CheckSavedBitcoinMessages5minutes = () => {
 }
 
 FindingConfirmations = () => {
-  SingleBlock();
   axios({
     method: "GET",
     url: `https://api.blockcypher.com/v1/btc/main/addrs/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF?includeScript=true`
@@ -376,6 +438,7 @@ FindingConfirmations = () => {
 
 // Function to find missing BTC transaction Hash if missing. 
 FindingBTCHASH = () => {
+  SingleBlock("FindingBTCHASH");
   FactomBlocks.find({ btc_hash: { $exists: false } }, (err, data) => {
     if (err) console.log("Err in find FindingBTCHASH", err)
     if (data.length > 0) {
@@ -395,13 +458,160 @@ FindingBTCHASH = () => {
         }).catch(err => { console.log("FindingBTCHASH ERROR: ", err) })
       })
     }
+    // else {
+    //   data.slice(data.length - 40, data.length - 1).forEach((block) => {
+    //     axios({
+    //       method: "GET",
+    //       url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
+    //     }).then(res => {
+    //       res.data.txs.forEach(tx => {
+    //         let keymr = tx.out[1].script.substring(tx.out[1].script.length - 64, tx.out[1].script.length)
+
+    //         if (keymr === block.keymr) {
+    //           FactomBlocks.findOneAndUpdate({ keymr: block.keymr }, { btc_hash: tx.hash }, (err, data) => {
+    //             if (err) console.log("Err in find", err)
+    //           })
+    //         }
+    //       })
+    //     }).catch(err => { console.log("FindingBTCHASH ERROR: ", err) })
+    //   }).then(() => {
+    //     data.forEach((block) => {
+    //       axios({
+    //         method: "GET",
+    //         url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
+    //       }).then(res => {
+    //         console.log("FindingBTCHASH res => ", res.data.txs.length)
+
+    //         res.data.txs.forEach(tx => {
+    //           console.log("FindingBTCHASH res out => ", tx.out)
+    //           let keymr = tx.out[1].script.substring(tx.out[1].script.length - 64, tx.out[1].script.length)
+    //           console.log("keymr => ", keymr)
+
+    //           if (keymr === block.keymr) {
+    //             console.log("keymr: ", keymr, " block.keymr: ", block.keymr)
+
+    //             FactomBlocks.findOneAndUpdate({ keymr: block.keymr }, { btc_hash: tx.hash }, (err, data) => {
+    //               if (err) console.log("Err in find", err)
+    //             })
+    //           }
+    //         })
+    //       }).catch(err => { console.log("FindingBTCHASH ERROR: ", err) })
+    //     })
+    //   })
+    // }
   })
 }
 
 
 setInterval(() => {
-  CheckSavedBitcoinMessages5minutes()
-  FindingBTCHASH()
+  // FindingBTCHASH()
   FindingConfirmations()
-  SingleBlock();
-}, 300010)
+}, 300010);
+// SingleBlock("SetInterval");
+
+JustGettingConfirmations = () => {
+  console.log("hi from JustGettingConfirmations")
+  FactomBlocks.find({ btc_conf: { $exists: false }, btc_hash: { $exists: true } }, null, { sort: { height: -1 } }, (err, blocks) => {
+    if (err) console.log("Error in JustGettingConfirmations: ", err);
+    console.log("blocks? => ", blocks)
+    if (blocks.length > 0) {
+      for (let i = 0; i < blocks.length; i++) {
+        axios({
+          method: "GET",
+          url: `https://blockexplorer.com/api/tx/${blocks[i].btc_hash}`
+        }).then(blockres => {
+          console.log("response => ", blockres.data)
+          if (blockres.data.confirmations > 0) {
+            FactomBlocks.findOneAndUpdate({ keymr: blocks[i].btc_hash }, { btc_conf: true }, (err, data) => {
+              if (err) console.log("Err in find", err)
+            })
+          }
+        }).catch(err => console.log("Error from blockchain.info => ", err))
+      }
+      // axios({
+      //   method: "GET",
+      //   url: `https://blockchain.info/rawtx/${res.data.data.btc_transaction}`
+      // }).then(blockres => {
+      //   let outScript = blockres.data.out[1].script;
+      //   let keyMR = outScript.substring(outScript.length - 64, outScript.length);
+      //   let height = parseInt(outScript.substring(12, 20), 16);
+      //   let transHash = blockres.data.hash;
+      //   let time = blockres.data.time;
+
+      //   let SaveData = new BlockchainDOTcom({
+      //     script: outScript,
+      //     keymr: keyMR,
+      //     height: height,
+      //     btc_trans_hash: transHash,
+      //     time: time,
+      //   })
+      // SaveData.save().then(() => {
+      //   FactomBlocks.findOneAndUpdate({ keymr: keyMR }, { btc_hash: transHash }, (err, data) => {
+      //   })
+      // }).catch(err => console.log("BlockchainDOTcom Save Error: ", err));
+      // }).catch(err => console.log("Blockchain.com Error: ", err.response))
+    }
+  })
+}
+
+// JustGettingConfirmations();
+
+GettingETHTxs = () => {
+  axios({
+    method: "GET",
+    url: `http://api.etherscan.io/api?module=account&action=txlist&address=0x334A31B3d9DE02e9B88FB3308a4406dF14D4Ae17&startblock=0&endblock=99999999&sort=asc&apikey=YourApiKeyToken`
+  }).then(res => {
+    console.log(res.data.result.length);
+    for (let i = 0; i < res.data.result.length; i++) {
+      let tx = res.data.result[i]
+      let SaveData = new EthereumTx({
+        eth_block: parseInt(tx.blockNumber),
+        time: new Date(parseInt(tx.timeStamp) * 1000),
+        eth_trx_hash: tx.hash,
+        confirmations: parseInt(tx.confirmations),
+        input: tx.input,
+        windowmr: tx.input.substring(tx.input.length - 64),
+        dbheight_max: parseInt(tx.input.substring(70, 74), 16),
+        dbheight_min: parseInt(tx.input.substring(70, 74), 16) - 999,
+      })
+      SaveData.save()
+    }
+  })
+}
+
+setTimeout(() => {
+  // GettingETHTxs()
+}, 200)
+
+setInterval(() => {
+  console.log("APICOUNT => ", APICOUNT)
+}, 4000)
+
+temp = (height) => {
+  FactomBlocks.findOneAndUpdate({ height: height }, { btc_conf: true }, (err, data) => {
+    if (err) console.log("Err in find", err)
+  })
+}
+// for (let i = 186499; i > 186372; i--) {
+
+//   temp(i)
+// }
+
+
+// for (let j = 200000; j > 185506; j--) {
+//   BlockchainDOTcom.find({ height: j }, (err, data) => {
+//     let keeper = data[0];
+//     // console.log("keeper", keeper)
+//     if (data.length > 1) {
+//       for (let i = 1; i < data.length; i++) {
+//         BlockchainDOTcom.findByIdAndRemove({ _id: data[i]["_id"] }, (err, data) => {
+//           if (err) {
+//             console.log("Nah, that aint it.")
+//           } else {
+//             console.log("YEaH: ")
+//           }
+//         })
+//       }
+//     }
+//   })
+// }
