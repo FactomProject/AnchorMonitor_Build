@@ -89,7 +89,6 @@ CallHarm = () => {
       "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
     }
   }).then(res => {
-    console.log(res.data.data)
     res.data.data.forEach(block => {
       let SaveBlock = new FactomBlocks({
         height: block.height,
@@ -169,6 +168,24 @@ DoINeedToCatchUp = async () => {
             })
             Helpers.UpdateFactomBlockWithBTCHash(SaveData)
           }).catch(err => console.log("Blockchain.com Error: ", err.response))
+        } else {
+          if (noHashList.length > 0) {
+            noHashList.splice(0, 10).forEach((block2) => {
+              axios({
+                method: "GET",
+                url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
+              }).then(res => {
+                res.data.txs.forEach(tx => {
+                  let keymr = tx.out[1].script.substring(tx.out[1].script.length - 64, tx.out[1].script.length)
+                  if (keymr === block2.keymr) {
+                    FactomBlocks.findOneAndUpdate({ keymr: block2.keymr }, { btc_hash: tx.hash }, (err, data) => {
+                      if (err) console.log("Err in find", err)
+                    })
+                  }
+                })
+              }).catch(err => { console.log("FindingBTCHASH ERROR: ", err) })
+            })
+          }
         }
       })
     })
@@ -183,7 +200,7 @@ CheckSavedBitcoinMessages = () => {
     })
     for (let i = 0; i <= sorted.length - 1; i++) {
       FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
-        if (err) console.log("Err in find", err)
+        if (err) console.log("Err in find in CheckSavedBitcoinMessages: ", err)
       })
     }
   })
@@ -197,7 +214,7 @@ FindingConfirmations = () => {
     res.data.txrefs.forEach((trans) => {
       if (trans.confirmations > 0) {
         FactomBlocks.findOneAndUpdate({ btc_hash: trans.tx_hash }, { btc_conf: true }, (err, data) => {
-          if (err) console.log("Err in find", err)
+          if (err) console.log("Err in find in FindingConfirmations: ", err)
         })
       }
     })
@@ -211,132 +228,13 @@ setInterval(() => {
 
 setInterval(() => {
   CallHarm()
+  CheckSavedBitcoinMessages()
+  DoINeedToCatchUp()
 }, 300000)
 
 setInterval(() => {
   FindingConfirmations()
 }, 300010);
-
-setInterval(() => {
-  DoINeedToCatchUp()
-  CheckSavedBitcoinMessages()
-}, 3600000)
-
-// Function to find missing BTC transaction Hash if missing. 
-// FindingBTCHASH = () => {
-//   TrysToFindBTCHashes("FindingBTCHASH");
-//   FactomBlocks.find({ btc_hash: { $exists: false } }, (err, data) => {
-//     if (err) console.log("Err in find FindingBTCHASH", err)
-//     if (data.length > 0) {
-//       data.forEach((block) => {
-//         axios({
-//           method: "GET",
-//           url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
-//         }).then(res => {
-//           res.data.txs.forEach(tx => {
-//             let keymr = tx.out[1].script.substring(tx.out[1].script.length - 64, tx.out[1].script.length)
-//             if (keymr === block.keymr) {
-//               FactomBlocks.findOneAndUpdate({ keymr: block.keymr }, { btc_hash: tx.hash }, (err, data) => {
-//                 if (err) console.log("Err in find", err)
-//               })
-//             }
-//           })
-//         }).catch(err => { console.log("FindingBTCHASH ERROR: ", err) })
-//       })
-//     }
-// else {
-//   data.slice(data.length - 40, data.length - 1).forEach((block) => {
-//     axios({
-//       method: "GET",
-//       url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
-//     }).then(res => {
-//       res.data.txs.forEach(tx => {
-//         let keymr = tx.out[1].script.substring(tx.out[1].script.length - 64, tx.out[1].script.length)
-
-//         if (keymr === block.keymr) {
-//           FactomBlocks.findOneAndUpdate({ keymr: block.keymr }, { btc_hash: tx.hash }, (err, data) => {
-//             if (err) console.log("Err in find", err)
-//           })
-//         }
-//       })
-//     }).catch(err => { console.log("FindingBTCHASH ERROR: ", err) })
-//   }).then(() => {
-//     data.forEach((block) => {
-//       axios({
-//         method: "GET",
-//         url: `https://blockchain.info/rawaddr/1K2SXgApmo9uZoyahvsbSanpVWbzZWVVMF`
-//       }).then(res => {
-//         console.log("FindingBTCHASH res => ", res.data.txs.length)
-
-//         res.data.txs.forEach(tx => {
-//           console.log("FindingBTCHASH res out => ", tx.out)
-//           let keymr = tx.out[1].script.substring(tx.out[1].script.length - 64, tx.out[1].script.length)
-//           console.log("keymr => ", keymr)
-
-//           if (keymr === block.keymr) {
-//             console.log("keymr: ", keymr, " block.keymr: ", block.keymr)
-
-//             FactomBlocks.findOneAndUpdate({ keymr: block.keymr }, { btc_hash: tx.hash }, (err, data) => {
-//               if (err) console.log("Err in find", err)
-//             })
-//           }
-//         })
-//       }).catch(err => { console.log("FindingBTCHASH ERROR: ", err) })
-//     })
-//   })
-// }
-//   })
-// }
-
-
-
-
-// JustGettingConfirmations = () => {
-//   console.log("hi from JustGettingConfirmations")
-//   FactomBlocks.find({ btc_conf: { $exists: false }, btc_hash: { $exists: true } }, null, { sort: { height: -1 } }, (err, blocks) => {
-//     if (err) console.log("Error in JustGettingConfirmations: ", err);
-//     console.log("blocks? => ", blocks)
-//     if (blocks.length > 0) {
-//       for (let i = 0; i < blocks.length; i++) {
-//         axios({
-//           method: "GET",
-//           url: `https://blockexplorer.com/api/tx/${blocks[i].btc_hash}`
-//         }).then(blockres => {
-//           console.log("response => ", blockres.data)
-//           if (blockres.data.confirmations > 0) {
-//             FactomBlocks.findOneAndUpdate({ keymr: blocks[i].btc_hash }, { btc_conf: true }, (err, data) => {
-//               if (err) console.log("Err in find", err)
-//             })
-//           }
-//         }).catch(err => console.log("Error from blockchain.info => ", err))
-//       }
-// axios({
-//   method: "GET",
-//   url: `https://blockchain.info/rawtx/${res.data.data.btc_transaction}`
-// }).then(blockres => {
-//   let outScript = blockres.data.out[1].script;
-//   let keyMR = outScript.substring(outScript.length - 64, outScript.length);
-//   let height = parseInt(outScript.substring(12, 20), 16);
-//   let transHash = blockres.data.hash;
-//   let time = blockres.data.time;
-
-//   let SaveData = new BlockchainDOTcom({
-//     script: outScript,
-//     keymr: keyMR,
-//     height: height,
-//     btc_trans_hash: transHash,
-//     time: time,
-//   })
-// SaveData.save().then(() => {
-//   FactomBlocks.findOneAndUpdate({ keymr: keyMR }, { btc_hash: transHash }, (err, data) => {
-//   })
-// }).catch(err => console.log("BlockchainDOTcom Save Error: ", err));
-// }).catch(err => console.log("Blockchain.com Error: ", err.response))
-//     }
-//   })
-// }
-
-// JustGettingConfirmations();
 
 GettingETHTxs = () => {
   axios({
@@ -364,61 +262,6 @@ GettingETHTxs = () => {
 setTimeout(() => {
   // GettingETHTxs()
 }, 200)
-
-temp = (height) => {
-  FactomBlocks.findOneAndUpdate({ height: height }, { btc_conf: true }, (err, data) => {
-    if (err) console.log("Err in find", err)
-  })
-}
-
-for (let i = 187510; i > 18650; i--) {
-  temp(i)
-}
-
-
-// for (let j = 200000; j > 185506; j--) {
-//   BlockchainDOTcom.find({ height: j }, (err, data) => {
-//     let keeper = data[0];
-//     // console.log("keeper", keeper)
-//     if (data.length > 1) {
-//       for (let i = 1; i < data.length; i++) {
-//         BlockchainDOTcom.findByIdAndRemove({ _id: data[i]["_id"] }, (err, data) => {
-//           if (err) {
-//             console.log("Nah, that aint it.")
-//           } else {
-//             console.log("YEaH: ")
-//           }
-//         })
-//       }
-//     }
-//   })
-// }
-
-/** 
- * 
- * Commented out on April 8, 2019
- * 
- */
-// CheckSavedBitcoinMessages5minutes = () => {
-//   BlockchainDOTcom.find({}, (err, data) => {
-//     let sorted = data.sort((a, b) => {
-//       return a.height - b.height
-//     })
-//     if (sorted.length < 10) {
-//       for (let i = 0; i <= sorted.length - 1; i++) {
-//         FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
-//           if (err) console.log("Err in find", err)
-//         })
-//       }
-//     } else {
-//       for (let i = 0; i <= 10; i++) {
-//         FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
-//           if (err) console.log("Err in find", err)
-//         })
-//       }
-//     }
-//   })
-// }
 
 // Helpers.GettingBackUp(187541, needHighest) 
 
