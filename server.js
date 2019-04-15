@@ -227,13 +227,13 @@ setInterval(() => {
 }, 13000)
 
 setInterval(() => {
-  // CallHarm()
-  // CheckSavedBitcoinMessages()
-  // DoINeedToCatchUp()
+  CallHarm()
+  CheckSavedBitcoinMessages()
+  DoINeedToCatchUp()
 }, 300000)
 
 setInterval(() => {
-  // FindingConfirmations()
+  FindingConfirmations()
 }, 300010);
 
 GettingETHTxs = () => {
