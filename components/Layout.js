@@ -2,10 +2,11 @@ import Head from 'next/head'
 import Link from 'next/link'
 import FactomIcon from '../assets/factom_horizontal_white'
 
-export default ({ children, title = 'This is the default title' }) => (
+export default ({ children, title = 'Anchor Monitor' }) => (
     <div className="PageLayout">
         <Head>
             <title>{title}</title>
+            <link rel="icon" href="/static/favicon.png" />
             <meta charSet='utf-8' />
             <meta name='viewport' content='initial-scale=1.0, width=device-width' />
         </Head>

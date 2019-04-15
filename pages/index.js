@@ -89,7 +89,7 @@ export default class Main extends Component {
         countHolder = (pendingNoti === 1 || pendingNoti === "1") ? `${pendingNoti} Block` : `${pendingNoti} Blocks`;
 
         return (
-            <Layout title='Bitcoin Anchors'>
+            <Layout>
                 <div className="Hero">
                     {Array.isArray(data) ? (
                         data.length !== 0 ? (
