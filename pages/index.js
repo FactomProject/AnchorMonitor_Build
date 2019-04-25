@@ -45,13 +45,15 @@ export default class Main extends Component {
     }
 
     offNotiSelect = (event) => {
+        let url = window.location.href.split('/')
+
         if (event.target.value === 30) {
-            axios.post(`http://localhost:3000/offnotificationchange`, null, { params: { time: "30 Minutes" } })
+            axios.post(`http://${url[2]}/offnotificationchange`, null, { params: { time: "30 Minutes" } })
             this.setState({
                 lastOff: "30 Minutes"
             })
         } else {
-            axios.post(`http://localhost:3000/offnotificationchange`, null, { params: { time: event.target.value } }).then(this.forceUpdate())
+            axios.post(`http://${url[2]}/offnotificationchange`, null, { params: { time: event.target.value } }).then(this.forceUpdate())
             this.setState({
                 lastOff: event.target.value
             })

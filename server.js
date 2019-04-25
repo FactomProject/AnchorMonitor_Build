@@ -103,8 +103,8 @@ CallHarm = () => {
 
 DoINeedToCatchUp = async () => {
   let noHashList = await Promise.resolve(Helpers.GetBlocksWithoutBTCHash(1))
-  if (noHashList.length > 30) {
-    noHashList.splice(0, 30).forEach((block) => {
+  if (noHashList.length > 5) {
+    noHashList.splice(0, 5).forEach((block) => {
       axios({
         method: "GET",
         url: `https://api.factom.com/v1/dblocks/${block.keymr}`,
