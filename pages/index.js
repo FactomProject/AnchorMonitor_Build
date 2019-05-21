@@ -74,7 +74,9 @@ export default class Main extends Component {
     }
 
     pendingNotiSelect = (event) => {
-        axios.post(`http://localhost:3000/pendingtimenotification`, null, { params: { time: event.target.value } });
+        let url = window.location.href.split('/')
+
+        axios.post(`http://${url[2]}/pendingtimenotification`, null, { params: { time: event.target.value } });
         this.setState({
             pendingNoti: event.target.value
         })
