@@ -79,7 +79,6 @@ setupWebSocket();
 
 // Function to call Harmony to find latest Factom blocks.
 CallHarm = () => {
-  console.log("CALLHARM")
   axios({
     method: "GET",
     url: "https://api.factom.com/v1/dblocks",
