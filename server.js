@@ -1,15 +1,10 @@
 var express = require('express');
-var express_graphql = require('express-graphql');
-var { buildSchema } = require('graphql');
 const axios = require("axios");
 var W3CWebSocket = require('websocket').w3cwebsocket;
 require('dotenv').config();
 const mongoose = require('mongoose');
 const FactomBlocks = require('./models/FactomBlocksSchema');
 const BlockchainDOTcom = require('./models/BlockchainDOTcomSchema');
-const PendingNotifications = require('./models/PendingNotifications');
-const NotificationsOff = require('./models/NotificationsOff');
-const SentToSlack = require('./models/SentToSlack');
 
 const Helpers = require("./lib/helpers")
 
@@ -103,7 +98,6 @@ CallHarm = () => {
 DoINeedToCatchUp = async () => {
   let noHashList = await Promise.resolve(Helpers.GetBlocksWithoutBTCHashORWithoutConfirmation(1))
   let randomNum = Helpers.RandomNum();
-  console.log("randomNum: ", randomNum);
   if (noHashList.length > randomNum) {
     noHashList.splice(0, randomNum).forEach((block) => {
       axios({
@@ -192,8 +186,6 @@ DoINeedToCatchUp = async () => {
     })
   }
 }
-DoINeedToCatchUp()
-
 
 // Function that checks if there are new Bitcoin transactions saved and matches them to Factom Blocks
 CheckSavedBitcoinMessages = () => {
@@ -232,7 +224,7 @@ setInterval(() => {
 setInterval(() => {
   CallHarm()
   CheckSavedBitcoinMessages()
-  // DoINeedToCatchUp()
+  DoINeedToCatchUp()
 }, 300000)
 
 setInterval(() => {
@@ -244,7 +236,6 @@ GettingETHTxs = () => {
     method: "GET",
     url: `http://api.etherscan.io/api?module=account&action=txlist&address=0x334A31B3d9DE02e9B88FB3308a4406dF14D4Ae17&startblock=0&endblock=99999999&sort=asc&apikey=YourApiKeyToken`
   }).then(res => {
-    console.log(res.data.result.length);
     for (let i = 0; i < res.data.result.length; i++) {
       let tx = res.data.result[i]
       let SaveData = new EthereumTx({
