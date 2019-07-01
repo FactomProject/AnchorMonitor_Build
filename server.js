@@ -101,9 +101,11 @@ CallHarm = () => {
 }
 
 DoINeedToCatchUp = async () => {
-  let noHashList = await Promise.resolve(Helpers.GetBlocksWithoutBTCHash(1))
-  if (noHashList.length > 5) {
-    noHashList.splice(0, 5).forEach((block) => {
+  let noHashList = await Promise.resolve(Helpers.GetBlocksWithoutBTCHashORWithoutConfirmation(1))
+  let randomNum = Helpers.RandomNum();
+  console.log("randomNum: ", randomNum);
+  if (noHashList.length > randomNum) {
+    noHashList.splice(0, randomNum).forEach((block) => {
       axios({
         method: "GET",
         url: `https://api.factom.com/v1/dblocks/${block.keymr}`,
@@ -190,6 +192,8 @@ DoINeedToCatchUp = async () => {
     })
   }
 }
+DoINeedToCatchUp()
+
 
 // Function that checks if there are new Bitcoin transactions saved and matches them to Factom Blocks
 CheckSavedBitcoinMessages = () => {
@@ -228,7 +232,7 @@ setInterval(() => {
 setInterval(() => {
   CallHarm()
   CheckSavedBitcoinMessages()
-  DoINeedToCatchUp()
+  // DoINeedToCatchUp()
 }, 300000)
 
 setInterval(() => {
@@ -262,5 +266,5 @@ setTimeout(() => {
   // GettingETHTxs()
 }, 200)
 
-// Helpers.GettingBackUp(187541, needHighest) 
+// Helpers.GettingBackUp(196397, 196647) 
 
