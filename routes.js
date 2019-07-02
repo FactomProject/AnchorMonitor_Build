@@ -45,6 +45,7 @@ app.prepare().then(() => {
     let blockList = await Promise.resolve(FindFactomBlocks());
     let BTC_Balance = await Promise.resolve(FindFactomsBitcoinBalance());
     let lastOff = await Promise.resolve(FindLastNotificationSetOff());
+    console.log("last off: ", lastOff)
     let pendingNoti = await Promise.resolve(FindLastPendingNoti());
     let last = blockList[0].height;
     for (let i = 1; i < blockList.length; i++) {
@@ -52,7 +53,14 @@ app.prepare().then(() => {
       last = blockList[i].height;
     }
 
-    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: last - 1, balance: BTC_Balance, lastOff: lastOff[0].notificationtime, pendingNoti: pendingNoti[0].notificationtime })
+    return app.render(req, res, '/', { 
+      name: "BTC",
+      data: blockList,
+      lastConf: last - 1,
+      balance: BTC_Balance,
+      lastOff: lastOff.length ? lastOff[0].notificationtime : "30 Minutes",
+      pendingNoti: pendingNoti.length ? pendingNoti[0].notificationtime : "1 Block"
+    })
   })
 
   server.get('/BTC', async (req, res) => {
@@ -66,7 +74,13 @@ app.prepare().then(() => {
       last = blockList[i].height;
     }
 
-    return app.render(req, res, '/', { name: "BTC", data: blockList, lastConf: last - 1, balance: BTC_Balance, lastOff: lastOff[0].notificationtime, pendingNoti: pendingNoti[0].notificationtime })
+    return app.render(req, res, '/', { name: "BTC",
+      data: blockList,
+      lastConf: last - 1,
+      balance: BTC_Balance,
+      lastOff: lastOff.length ? lastOff[0].notificationtime : "30 Minutes",
+      pendingNoti: pendingNoti.length ? pendingNoti[0].notificationtime : "1 Block"
+    })
   })
 
   server.get('/ETH', (req, res) => {
