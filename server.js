@@ -64,7 +64,7 @@ setupWebSocket = () => {
           btc_trans_hash: transHash,
           time: time,
         })
-        Helpers.UpdateFactomBlockWithBTCHash(SaveData)
+        Helpers.UpdateFactomBlockWithBTCHash(SaveData, "On Socket message")
       }
     }, 1000)
   };
@@ -79,8 +79,8 @@ CallHarm = () => {
     url: "https://api.factom.com/v1/dblocks",
     headers: {
       "Content-Type": "application/json",
-      "app_id": "c6bd4cff",
-      "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+      "app_id": process.env.APPID,
+      "app_key": process.env.APPKEY
     }
   }).then(res => {
     res.data.data.forEach(block => {
@@ -105,8 +105,8 @@ DoINeedToCatchUp = async () => {
         url: `https://api.factom.com/v1/dblocks/${block.keymr}`,
         headers: {
           "Content-Type": "application/json",
-          "app_id": "c6bd4cff",
-          "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+          "app_id": process.env.APPID,
+          "app_key": process.env.APPKEY
         }
       }).then(res => {
         if (res.data.data.btc_transaction !== null) {
@@ -127,7 +127,7 @@ DoINeedToCatchUp = async () => {
               btc_trans_hash: transHash,
               time: time,
             })
-            Helpers.UpdateFactomBlockWithBTCHash(SaveData)
+            Helpers.UpdateFactomBlockWithBTCHash(SaveData, "do I need to catch up, larger than 1 - 5")
           }).catch(err => console.log("Blockchain.com Error: ", err.response))
         }
       })
@@ -139,8 +139,8 @@ DoINeedToCatchUp = async () => {
         url: `https://api.factom.com/v1/dblocks/${block.keymr}`,
         headers: {
           "Content-Type": "application/json",
-          "app_id": "c6bd4cff",
-          "app_key": "0d3d184ba18b8d7762b97cfa9a6cf7cb"
+          "app_id": process.env.APPID,
+          "app_key": process.env.APPKEY
         }
       }).then(res => {
         if (res.data.data.btc_transaction !== null) {
@@ -161,7 +161,7 @@ DoINeedToCatchUp = async () => {
               btc_trans_hash: transHash,
               time: time,
             })
-            Helpers.UpdateFactomBlockWithBTCHash(SaveData)
+            Helpers.UpdateFactomBlockWithBTCHash(SaveData, "do I need to catch up, less than 1 - 5")
           }).catch(err => console.log("Blockchain.com Error: ", err.response))
         } else {
           if (noHashList.length > 0) {
