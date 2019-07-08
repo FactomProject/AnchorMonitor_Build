@@ -23,6 +23,12 @@ app.prepare().then(() => {
 
   const server = express()
 
+  server.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+
   FindFactomBlocks = () => {
     return FactomBlocks.find({ btc_conf: { $exists: false } }, null, { sort: { height: -1 } })
   }
@@ -58,7 +64,7 @@ app.prepare().then(() => {
         last = blockList[i].height;
       }
     }
-    
+
     let BTC_Balance = await Promise.resolve(FindFactomsBitcoinBalance());
     let lastOff = await Promise.resolve(FindLastNotificationSetOff());
     let pendingNoti = await Promise.resolve(FindLastPendingNoti());
