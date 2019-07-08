@@ -189,16 +189,13 @@ DoINeedToCatchUp = async () => {
 
 // Function that checks if there are new Bitcoin transactions saved and matches them to Factom Blocks
 CheckSavedBitcoinMessages = () => {
-  BlockchainDOTcom.find({}, (err, data) => {
-    let sorted = data.sort((a, b) => {
-      return a.height - b.height
+  let sorted = BlockchainDOTcom.find({}, null, { sort: { height: -1 } } )
+
+  for (let i = 0; i <= sorted.length - 1; i++) {
+    FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
+      if (err) console.log("Err in find in CheckSavedBitcoinMessages: ", err)
     })
-    for (let i = 0; i <= sorted.length - 1; i++) {
-      FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
-        if (err) console.log("Err in find in CheckSavedBitcoinMessages: ", err)
-      })
-    }
-  })
+  }
 }
 
 FindingConfirmations = () => {
@@ -223,8 +220,8 @@ setInterval(() => {
 
 setInterval(() => {
   CallHarm()
-  CheckSavedBitcoinMessages()
   DoINeedToCatchUp()
+  CheckSavedBitcoinMessages()
 }, 300000)
 
 setInterval(() => {
@@ -258,4 +255,3 @@ setTimeout(() => {
 }, 200)
 
 // Helpers.GettingBackUp(196397, 196647) 
-
