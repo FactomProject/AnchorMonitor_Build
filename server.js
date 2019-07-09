@@ -216,9 +216,11 @@ FindingConfirmations = () => {
 }
 
 setInterval(() => {
-  Helpers.SlackBTCBalance(process.env.URL)
-  Helpers.SlackNotification(process.env.URL)
+  // Helpers.SlackBTCBalance(process.env.URL)
+  // Helpers.SlackNotification(process.env.URL)
 }, 13000)
+Helpers.SlackBTCBalance(process.env.URL)
+  Helpers.SlackNotification(process.env.URL)
 
 setInterval(() => {
   CallHarm()
