@@ -47,7 +47,6 @@ setupWebSocket = () => {
   };
 
   client.onmessage = function (e) {
-    console.log("got message: ", e.data)
     CallHarm();
     setTimeout(() => {
       if (typeof e.data === 'string') {
@@ -94,7 +93,7 @@ CallHarm = () => {
       SaveBlock.save().then(() => {
       }).catch(err => err.code === 11000 ? null : console.log("FactomBlocks Save Error: ", err));
     });
-  }).catch(err => console.log("CallHarm ERROR", err.response))
+  }).catch(err => console.log("CallHarm ERROR", err.response.data))
 }
 
 DoINeedToCatchUp = async () => {
