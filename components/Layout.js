@@ -9,7 +9,6 @@ export default ({ children, title = 'Anchor Monitor' }) => (
             <link rel="icon" href="/static/faviconV4AM.png" />
             <meta charSet='utf-8' />
             <meta name='viewport' content='initial-scale=1.0, width=device-width' />
-            <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
         </Head>
         <header className="Header">
             <nav className="HeaderGroup">

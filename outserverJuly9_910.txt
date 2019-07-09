@@ -1,0 +1,5 @@
+setupWebSocket Called
+Express Server Now Running On 6001
+Connected to database in Helper.js
+Connected to database
+WebSocket Client Bitcoin Connected

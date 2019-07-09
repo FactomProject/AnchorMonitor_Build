@@ -1,0 +1,30 @@
+Connected to database
+[2:12:48 PM] Compiling server
+[2:12:49 PM] Compiled server in 203ms
+[2:12:49 PM] Compiling client
+[2:12:51 PM] Compiled client in 1s
+ DONE  Compiled successfully in 2414ms2:12:51 PM
+
+> Ready on http://localhost:3000
+ WAIT  Compiling...2:12:51 PM
+
+[2:12:51 PM] Compiling client
+[2:12:51 PM] Compiled client in 58ms
+ DONE  Compiled successfully in 79ms2:12:51 PM
+
+> Building page: /
+ WAIT  Compiling...2:14:02 PM
+
+[2:14:02 PM] Compiling server
+[2:14:02 PM] Compiling client
+[2:14:05 PM] Compiled server in 4s
+[2:14:06 PM] Compiled client in 4s
+ DONE  Compiled successfully in 4009ms2:14:06 PM
+
+> Disposing inactive page(s): /
+[2:15:08 PM] Compiling server
+[2:15:08 PM] Compiled server in 16ms
+[2:15:09 PM] Compiling client
+[2:15:09 PM] Compiled client in 96ms
+ DONE  Compiled successfully in 231ms2:15:09 PM
+
