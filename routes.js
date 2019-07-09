@@ -56,7 +56,9 @@ app.prepare().then(() => {
     let last = 0;
     if (!blockList.length) {
       let allBlocks = await Promise.resolve(FindBlocks());
-      last = allBlocks[0].height
+      if (allBlocks.length) {
+        last = allBlocks[0].height
+      }
     } else {
       last = blockList[0].height
       for (let i = 1; i < blockList.length; i++) {
