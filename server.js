@@ -47,6 +47,7 @@ setupWebSocket = () => {
   };
 
   client.onmessage = function (e) {
+    console.log("got message: ", e.data)
     CallHarm();
     setTimeout(() => {
       if (typeof e.data === 'string') {
@@ -74,6 +75,7 @@ setupWebSocket();
 
 // Function to call Harmony to find latest Factom blocks.
 CallHarm = () => {
+  console.log("CallHarm Called")
   axios({
     method: "GET",
     url: "https://api.factom.com/v1/dblocks",
@@ -214,8 +216,8 @@ FindingConfirmations = () => {
 }
 
 setInterval(() => {
-  Helpers.SlackBTCBalance()
-  Helpers.SlackNotification()
+  Helpers.SlackBTCBalance(process.env.URL)
+  Helpers.SlackNotification(process.env.URL)
 }, 13000)
 
 setInterval(() => {

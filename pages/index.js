@@ -48,12 +48,12 @@ export default class Main extends Component {
         let url = window.location.href.split('/')
 
         if (event.target.value === 30) {
-            axios.post(`http://${url[2]}/offnotificationchange`, null, { params: { time: "30 Minutes" }, headers: {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'} })
+            axios.post(`https://${url[2]}/offnotificationchange`, null, { params: { time: "30 Minutes" }, headers: {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'} })
             this.setState({
                 lastOff: "30 Minutes"
             })
         } else {
-            axios.post(`http://${url[2]}/offnotificationchange`, null, { params: { time: event.target.value }, headers: {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'} }).then(this.forceUpdate())
+            axios.post(`https://${url[2]}/offnotificationchange`, null, { params: { time: event.target.value }, headers: {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'} }).then(this.forceUpdate())
             this.setState({
                 lastOff: event.target.value
             })
@@ -76,7 +76,7 @@ export default class Main extends Component {
     pendingNotiSelect = (event) => {
         let url = window.location.href.split('/')
 
-        axios.post(`http://${url[2]}/pendingtimenotification`, null, { params: { time: event.target.value }, headers: {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'} });
+        axios.post(`https://${url[2]}/pendingtimenotification`, null, { params: { time: event.target.value }, headers: {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'} });
         this.setState({
             pendingNoti: event.target.value
         })
