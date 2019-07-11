@@ -189,9 +189,8 @@ DoINeedToCatchUp = async () => {
 }
 
 // Function that checks if there are new Bitcoin transactions saved and matches them to Factom Blocks
-CheckSavedBitcoinMessages = () => {
-  let sorted = BlockchainDOTcom.find({}, null, { sort: { height: -1 } } )
-
+CheckSavedBitcoinMessages = async() => {
+  let sorted = await Promise.resolve(Helpers.GetAllBlockchainDOTcoms());
   for (let i = 0; i <= sorted.length - 1; i++) {
     FactomBlocks.findOneAndUpdate({ keymr: sorted[i].keymr }, { btc_hash: sorted[i].btc_trans_hash }, (err, data) => {
       if (err) console.log("Err in find in CheckSavedBitcoinMessages: ", err)
