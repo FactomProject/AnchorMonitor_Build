@@ -51,7 +51,7 @@ jobs:
           name: Load Docker image layer cache
           command: |
             set +o pipefail
-            docker load -i /images/apiplus_ui.tar | true
+            docker load -i /images/anchor_monitor.tar | true
       - run:
           name: Build the container
           command: |
@@ -68,12 +68,12 @@ jobs:
             fi
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               # Tag master as latest
-              docker tag apiplus_ui factominc/anchor_monitor:latest
+              docker tag anchor_monitor factominc/anchor_monitor:latest
               docker push factominc/anchor_monitor:latest
             fi
             if [ "${CIRCLE_BRANCH}" == "develop" ]; then
               # Tag develop as develop anyhow
-              docker tag apiplus_ui factominc/anchor_monitor:develop
+              docker tag anchor_monitor factominc/anchor_monitor:develop
               docker push factominc/anchor_monitor:develop
             fi
             docker logout
@@ -85,17 +85,17 @@ jobs:
             ${login}
             # If there is a tag, use it
             if [ "$CIRCLE_TAG" != "" ]; then
-              docker tag apiplus_ui ${AWS_REPO_BASE_URI}/anchor_monitor:${CIRCLE_TAG}
+              docker tag anchor_monitor ${AWS_REPO_BASE_URI}/anchor_monitor:${CIRCLE_TAG}
               docker push ${AWS_REPO_BASE_URI}/anchor_monitor:${CIRCLE_TAG}
             fi
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               # Tag master as latest
-              docker tag apiplus_ui ${AWS_REPO_BASE_URI}/anchor_monitor:latest
+              docker tag anchor_monitor ${AWS_REPO_BASE_URI}/anchor_monitor:latest
               docker push ${AWS_REPO_BASE_URI}/anchor_monitor:latest
             fi
             if [ "${CIRCLE_BRANCH}" == "develop" ]; then
               # Tag develop as develop anyhow
-              docker tag apiplus_ui ${AWS_REPO_BASE_URI}/anchor_monitor:develop
+              docker tag anchor_monitor ${AWS_REPO_BASE_URI}/anchor_monitor:develop
               docker push ${AWS_REPO_BASE_URI}/anchor_monitor:develop
             fi
             docker logout
