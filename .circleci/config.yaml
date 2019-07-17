@@ -1,0 +1,138 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8.11.3
+
+    working_directory: ~/AnchorMonitor
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run: npm install
+
+      - run: npm run test
+
+      - run: VERSION=$CIRCLE_TAG npm run build
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+  # Build the docker container
+  docker_build:
+    working_directory: ~/AnchorMonitor
+
+    docker:
+      - image: factominc/elixir_python
+
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          version: 17.06.0-ce
+
+      # Restore individual docker images from the cache
+      - restore_cache:
+          keys:
+            - v1-docker-dependencies-{{ checksum "package.json" }}
+            - v1-docker-dependencies-
+
+      # Load the image if the cache hit
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            docker load -i /images/apiplus_ui.tar | true
+      - run:
+          name: Build the container
+          command: |
+            docker build --build-arg "--build-arg "version=$CIRCLE_TAG" -t anchor_monitor .
+      - run:
+          name: Push images to DockerHub
+          command: |
+           # Login to DockerHub
+            docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+            # If there is a tag, use it
+            if [ "$CIRCLE_TAG" != "" ]; then
+              docker tag anchor_monitor factominc/anchor_monitor:${CIRCLE_TAG}
+              docker push factominc/anchor_monitor:${CIRCLE_TAG}
+            fi
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              # Tag master as latest
+              docker tag apiplus_ui factominc/anchor_monitor:latest
+              docker push factominc/anchor_monitor:latest
+            fi
+            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+              # Tag develop as develop anyhow
+              docker tag apiplus_ui factominc/anchor_monitor:develop
+              docker push factominc/anchor_monitor:develop
+            fi
+            docker logout
+      - run:
+          name: Push images to AWS ECR
+          command: |
+            # Login to AWS ECR
+            login="$(aws ecr get-login  --no-include-email --region $AWS_REGION)"
+            ${login}
+            # If there is a tag, use it
+            if [ "$CIRCLE_TAG" != "" ]; then
+              docker tag apiplus_ui ${AWS_REPO_BASE_URI}/anchor_monitor:${CIRCLE_TAG}
+              docker push ${AWS_REPO_BASE_URI}/anchor_monitor:${CIRCLE_TAG}
+            fi
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              # Tag master as latest
+              docker tag apiplus_ui ${AWS_REPO_BASE_URI}/anchor_monitor:latest
+              docker push ${AWS_REPO_BASE_URI}/anchor_monitor:latest
+            fi
+            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+              # Tag develop as develop anyhow
+              docker tag apiplus_ui ${AWS_REPO_BASE_URI}/anchor_monitor:develop
+              docker push ${AWS_REPO_BASE_URI}/anchor_monitor:develop
+            fi
+            docker logout
+      - save_cache:
+          key: v1-docker-dependencies-{{ checksum "package.json" }}
+          paths:
+            - /images
+
+workflows:
+  version: 2
+  commit-workflow:
+    jobs:
+      - build:
+          context: org-global
+          filters:
+            tags:
+              only: /.*/
+      - docker_build:
+          context: org-global
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - build
+
+
+  scheduled-workflow:
+    triggers:
+      - schedule:
+          cron: "30 4 * * *"
+          filters:
+            branches:
+              only: develop
+    jobs:
+      - build:
+          context: org-global
+      - docker_build:
+          context: org-global
+          requires:
+            - build

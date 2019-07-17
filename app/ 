@@ -1,0 +1,26 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQVBKSFZWRnZWQkpMbU5kMlIreFFXNzR3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa05UYzRaVGt6WXpRdE56VTNNQzAwWmpKaExUZ3hNRGN0T0Rsak5HWTJOV1U1T1RrMQpNQjRYRFRFNU1ERXlOVEU0TkRreE1sb1hEVEkwTURFeU5ERTVORGt4TWxvd0x6RXRNQ3NHQTFVRUF4TWtOVGM0ClpUa3pZelF0TnpVM01DMDBaakpoTFRneE1EY3RPRGxqTkdZMk5XVTVPVGsxTUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBejhjaDhNY3IwZDVMT0pTSy96c2ZENkhZdkZYa21wRHpiYlh6c3BxNgp1d0tlZy9jdGpTVUtwdU5ZRURCYmZCVmlraGE1bzFkd05jYW0xcVBkemprWnowZTMrTmFMVWFWUXBSS0JlMmcvCkdUZnNYWWhVSDV5a2FUamk3b0VrMENtMWlmd1UvYmN4eVpqbzBOalNkRWRPam10bE1xRCtOMUlWOXo4Rk40RkQKUUJsOWFhWkMrRWpnY2lKVVA4WW1pYVIwbm5waUZ3YjFyWXBGa292OGxVTk1ZSlQ2N3dCd1RjeEg1SHErMW41cApHS3VXK2s1dS9hMTFUSE1ZNEhNcXpqYXJJYklEdTlUNHJIWGZxdDZCLzI2RTNXeTRIZ09iQ2RTNEhYOGFreUUyClMzMGlXbzBMUmJjSWJaMmI1SG8veFdxdkM3K0ZmLzlCVjRHNUxhUXhyVTk0NVFJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpjaVpmUnNNN1BSWGpZTFZnaWZIVGlmbC9LdW9WU3dCZ0FaVDA5YzRTdDU3VVZzMVJscmxwNGlVcElRYTVycTYyCkl1Z3pYRngvNkJiNy8zZEpOcVFqRmtRYTY4anlRTk1RYWozcFRRSm9zMy90elpYeURWWk04R0lDbis1U2VzTTgKaGxvcDA0Z2dySjYvVy9KckgrMkVrYnZmeWpTUlZ2ZlZCdjhjbFNhc1drdHI5WlNFQ3hQeEtqbm1DVnMyS0tWNQpUa3k0NEMvTG9hV2k2VzlxdFdEcXB6RHpoRUU2UFFpdjNTdEVWU0tteGhRUHlXaGJEcVVHd1VydWNxZUMzNjA4ClhIZDcrNjJTNXlBUVdHTlEyWHYxV2d0ZXhWZHdwOVIyVUlsc2pZcU9XOTdvUUJxUXBqaUFuUGlHazZIeloxVXIKd1Fad0JJL3Y1c0w0ZXBlR2g0MmNtQT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    server: https://35.222.113.160
+  name: gke_factomd-dev_us-central1-a_factomd-restart-devnet-cluster
+contexts:
+- context:
+    cluster: gke_factomd-dev_us-central1-a_factomd-restart-devnet-cluster
+    user: gke_factomd-dev_us-central1-a_factomd-restart-devnet-cluster
+  name: gke_factomd-dev_us-central1-a_factomd-restart-devnet-cluster
+current-context: gke_factomd-dev_us-central1-a_factomd-restart-devnet-cluster
+kind: Config
+preferences: {}
+users:
+- name: gke_factomd-dev_us-central1-a_factomd-restart-devnet-cluster
+  user:
+    auth-provider:
+      config:
+        access-token: ya29.GlxGB_62v17Tgv-dpr4-mzgXIrdq1jRhF5yDYNEqwJ4tt1P5PMP65pjfP0Y1SWYg1t7tG6bSKuDlMtAP6THn7lSpzteAfWSLHDjYs4UC5rJP_c-jpbD2SY05wuM-kA
+        cmd-args: config config-helper --format=json
+        cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud
+        expiry: "2019-07-15T15:55:14Z"
+        expiry-key: '{.credential.token_expiry}'
+        token-key: '{.credential.access_token}'
+      name: gcp
