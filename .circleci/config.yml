@@ -77,28 +77,6 @@ jobs:
               docker push factominc/anchor_monitor:develop
             fi
             docker logout
-      - run:
-          name: Push images to AWS ECR
-          command: |
-            # Login to AWS ECR
-            login="$(aws ecr get-login  --no-include-email --region $AWS_REGION)"
-            ${login}
-            # If there is a tag, use it
-            if [ "$CIRCLE_TAG" != "" ]; then
-              docker tag anchor_monitor ${AWS_REPO_BASE_URI}/anchor_monitor:${CIRCLE_TAG}
-              docker push ${AWS_REPO_BASE_URI}/anchor_monitor:${CIRCLE_TAG}
-            fi
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              # Tag master as latest
-              docker tag anchor_monitor ${AWS_REPO_BASE_URI}/anchor_monitor:latest
-              docker push ${AWS_REPO_BASE_URI}/anchor_monitor:latest
-            fi
-            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-              # Tag develop as develop anyhow
-              docker tag anchor_monitor ${AWS_REPO_BASE_URI}/anchor_monitor:develop
-              docker push ${AWS_REPO_BASE_URI}/anchor_monitor:develop
-            fi
-            docker logout
       - save_cache:
           key: v1-docker-dependencies-{{ checksum "package.json" }}
           paths:
