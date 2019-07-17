@@ -1,5 +1,4 @@
 FROM node:8.12.0
-COPY app app/
-COPY entrypoint.sh app/
+COPY * app/
 WORKDIR app/
 ENTRYPOINT ["/app/entrypoint.sh"]
