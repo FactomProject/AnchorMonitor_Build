@@ -55,7 +55,7 @@ jobs:
       - run:
           name: Build the container
           command: |
-            docker build --build-arg "--build-arg "version=$CIRCLE_TAG" -t anchor_monitor .
+            docker build --build-arg "version=$CIRCLE_TAG" -t anchor_monitor .
       - run:
           name: Push images to DockerHub
           command: |
