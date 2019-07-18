@@ -77,10 +77,14 @@ jobs:
               docker push factominc/anchor_monitor:develop
             fi
             docker logout
-      - save_cache:
-          key: v1-docker-dependencies-{{ checksum "package.json" }}
-          paths:
-            - /images
+      - run:
+          name: Push images to GCR
+          command: |
+            echo ${GOOGLE_AUTH} > ${HOME}/gcp-key.json
+            docker tag anchor_monitor gcr.io/factomd-dev/anchor_monitor:latest
+            gcloud auth activate-service-account --key-file ${HOME}/gcp-key.json
+            gcloud --quiet config set project factomd-dev
+            gcloud docker -- push gcr.io/factomd-dev/anchor_monitor:latest
 
 workflows:
   version: 2
