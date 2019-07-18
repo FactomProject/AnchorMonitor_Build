@@ -32,7 +32,7 @@ jobs:
     working_directory: ~/AnchorMonitor
 
     docker:
-      - image: factominc/elixir_python
+      - image: google/cloud-sdk
 
     steps:
       - checkout
